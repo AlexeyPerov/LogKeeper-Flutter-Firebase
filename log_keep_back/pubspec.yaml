@@ -1,0 +1,23 @@
+name: log_keep_back
+description: LogKeep backend
+publish_to: 'none'
+version: 0.0.1
+author:
+homepage:
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  log_keep_shared:
+    path: ../pkg/log_keep_shared
+
+  googleapis: ^0.56.1
+  googleapis_auth: ^0.2.12
+
+  string_unescape: ^1.5.1
+
+  intl: ^0.16.0
+  shelf: ^0.7.3
+  shelf_body_parser: ^1.0.6
+  http: ^0.12.0+2

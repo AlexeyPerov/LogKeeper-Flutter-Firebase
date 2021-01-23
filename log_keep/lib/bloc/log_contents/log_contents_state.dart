@@ -1,0 +1,21 @@
+import 'package:equatable/equatable.dart';
+import 'package:log_keep_shared/log_keep_shared.dart';
+
+abstract class LogContentsState extends Equatable {
+  @override
+  List<Object> get props => [];
+}
+
+class LogContentsLoaded extends LogContentsState {
+  final LogEntity log;
+
+  LogContentsLoaded(this.log);
+
+  @override
+  List<Object> get props => [log];
+
+  @override
+  String toString() => 'LogContentsLoaded { log: $log }';
+}
+
+class LogContentsNotLoaded extends LogContentsState {}

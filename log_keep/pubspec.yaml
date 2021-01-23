@@ -1,0 +1,57 @@
+name: log_keep
+description: LogKeep app
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  firebase_core: "0.5.3"
+  cloud_firestore: 0.14.4
+
+  firestore_cache: ^0.2.0
+
+  tuple: ^1.0.3
+
+  get_it: ^5.0.3
+
+  flutter_bloc: ^6.1.1
+
+  darq: ^0.4.0+1
+
+  file_picker_cross: ^4.2.6
+
+  log_keep_shared:
+    path: ../pkg/log_keep_shared
+
+  cupertino_icons: ^0.1.3
+  intl: ^0.16.0
+  clipboard_manager: ^0.0.1
+
+  url_launcher: ^5.7.10
+
+  universal_html: ^1.2.3
+  web_browser: ^0.4.0
+
+  uiblock: ^1.0.0
+
+  equatable: ^1.2.5
+  rxdart: ^0.24.0
+
+  logger: ^0.9.4
+
+  hive: ^1.4.4+1
+  path_provider: ^1.6.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
