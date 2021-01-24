@@ -75,8 +75,11 @@ class _LogViewState extends State<LogView> {
       Padding(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Scrollbar(
-          child: Container(
-            height: 100,
+          child: ConstrainedBox(
+            constraints: new BoxConstraints(
+              minHeight: 10.0,
+              maxHeight: 100.0,
+            ),
             child: SelectableText(
               widget.log.info.title,
               toolbarOptions: commonToolbarOptions(),
