@@ -1,8 +1,9 @@
 # LogKeep
 
-This is a tool (iOS/Android/Web) written in Dart lang for logs share.
+This is a tool (iOS/Android/Web/Server) written in Dart lang for logs share.
 
 We use it in production to help QA and other people to attach and retrieve logs easier.
+After uploading a log, you get a link to it which can be attached e.g. to your task tracker tickets.
 Hope it will help someone too.
 
 It is also an example of:
@@ -67,9 +68,9 @@ Service account credentials could be passed to log_keep_back via .env file:
 Instructions on how to build & deploy server can also be found here https://hub.docker.com/r/google/dart-runtime-base
 
 ## To build and host client use
-cd log_keep
-flutter build web  
-firebase deploy --only hosting
+* cd log_keep
+* flutter build web  
+* firebase deploy --only hosting
 
 ## Screenshots
 * https://monosnap.com/file/lsKyrrDvDedPPyPkIufYu9sxZZrq3M
