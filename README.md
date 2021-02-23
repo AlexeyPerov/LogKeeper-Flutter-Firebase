@@ -67,7 +67,7 @@ Service account credentials could be passed to log_keep_back via .env file:
 
 Instructions on how to build & deploy server can also be found here https://hub.docker.com/r/google/dart-runtime-base
 
-## To build and host client use
+## To build and host Web client use
 * cd log_keep
 * flutter build web  
 * firebase deploy --only hosting
