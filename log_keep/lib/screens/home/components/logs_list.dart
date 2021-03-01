@@ -146,18 +146,18 @@ class _LogsListState extends State<LogsList> {
 
   Widget _logCard(BuildContext context, LogInfoEntity logInfo) {
     var title = logInfo.title.splitWordsByLength(kIsWeb ? 64 : 32);
-    var titleMainStyle = TextStyle(
+    var titleMainStyle = const TextStyle(
       color: Colors.black,
       fontSize: 18.0,
       decoration: TextDecoration.underline,
       fontWeight: FontWeight.w600,
     );
-    var titleSecondaryStyle = TextStyle(
+    var titleSecondaryStyle = const TextStyle(
       color: Colors.black,
       fontSize: 14.0,
       fontWeight: FontWeight.w300,
     );
-    var dateStyle = TextStyle(
+    var dateStyle = const TextStyle(
       color: Color(0xFFAFB4C6),
       fontSize: 18.0,
       fontWeight: FontWeight.w500,

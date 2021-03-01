@@ -127,17 +127,18 @@ class FirestoreLogsRepository extends LogsRepository {
     }
 
     var logInfoData = logInfoQuery.data();
-    Timestamp timestamp = logInfoData.getValueOrDefault('createdAt', DateTime.fromMicrosecondsSinceEpoch(0));
-        
+    Timestamp timestamp = logInfoData.getValueOrDefault(
+        'createdAt', DateTime.fromMicrosecondsSinceEpoch(0));
+
     var info = new LogInfoEntity(
         id: logInfoQuery.id,
-        author: logInfoData.getValueOrDefault('author', defaultNotAvailableValue),
+        author:
+            logInfoData.getValueOrDefault('author', defaultNotAvailableValue),
         title: logInfoData.getValueOrDefault('title', defaultNotAvailableValue),
         contentsId: logInfoQuery['contentsId'],
         createdAt: timestamp.toDate());
 
-    var logDataRef =
-        _provider.collection('logs').doc(info.contentsId);
+    var logDataRef = _provider.collection('logs').doc(info.contentsId);
 
     var logDataQuery = await FirestoreCache.getDocument(logDataRef);
 
@@ -147,7 +148,8 @@ class FirestoreLogsRepository extends LogsRepository {
     }
 
     var logData = new LogContentsEntity(
-        id: logDataQuery.id, contents: logDataQuery.data().getValueOrDefault('contents', ''));
+        id: logDataQuery.id,
+        contents: logDataQuery.data().getValueOrDefault('contents', ''));
 
     var result = new LogEntity(project: project, info: info, data: logData);
 
@@ -205,5 +207,5 @@ ProjectInfo get defaultProjectInfo {
 }
 
 Stream<int> defaultStream() async* {
-    yield 0;
+  yield 0;
 }
