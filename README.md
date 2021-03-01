@@ -1,4 +1,4 @@
-# LogKeep
+# LogKeeper
 
 This is a Flutter tool used for easy logs sharing within development and QA teams.
 Supports iOS/Android/Web and  Dart backend API.
@@ -82,7 +82,7 @@ in order to use shared code in log_keep_shared both on the client and server sid
 * Add apps that you need (iOS/Android/Web)
 * Enable Firestore and create empty collections ("projects" and "logs")
 
-### Setup it up in your project
+### Attach Firebase to your local copy
 
 in log_keep:
 * add google-services.json for Android
@@ -105,7 +105,7 @@ firebase.initializeApp(firebaseConfig);
 
 ### Google Service Account
 
-For a backend to run you will need a Google Service Account https://cloud.google.com/iam/docs/service-accounts. 
+For a backend to run you need a Google Service Account https://cloud.google.com/iam/docs/service-accounts. 
 
 Service account credentials could be passed to log_keep_back via .env file:
 * private_key_id
