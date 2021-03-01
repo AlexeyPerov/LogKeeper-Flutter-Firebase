@@ -1,36 +1,86 @@
 # LogKeep
 
-This is a tool (iOS/Android/Web/Server) written in Dart lang for logs share.
+This is a Flutter tool used for easy logs sharing within development and QA teams.
+Supports iOS/Android/Web and  Dart backend API.
 
-We use it in production to help QA and other people to attach and retrieve logs easier.
-After uploading a log, you get a link to it which can be attached e.g. to your task tracker tickets.
-Hope it will help someone too.
+## Usage example
 
-It is also an example of:
-* Flutter Bloc pattern usage
-* Firebase & Firestore usage
-* simple Dart backend (with shelf and Firebase)
-* shared Dart code project usage (and how to use Docker with it)
+Typical usage:
+* QA engineer or anyone in the team encounters error in the app
+* Whether it is an error popup or just a suspicious behaviour there is a button to call LogKeeper (to upload logs there)
+* This button reads log file and makes POST request. An example below is for C# Unity 
 
-So this repository contains 3 projects:
+```csharp
+var form = new WWWForm();
+
+// Prepare log data
+form.AddField("title", title);
+form.AddField("author", author);
+form.AddField("project", project);
+form.AddField("contents", contents); // the log contents
+
+// Send
+var uwr = UnityWebRequest.Post("your_url" + "/save", form);
+yield return uwr.SendWebRequest();
+if (uwr.isNetworkError || uwr.isHttpError)
+{
+    // error
+    return;
+}
+
+// Read result
+var raw = Encoding.UTF8.GetString(uwr.downloadHandler.data);
+var id = JSON.Parse(raw)["body"]["id"].Value;
+var urlFormat = JSON.Parse(raw)["body"]["url_format"].Value;
+
+// Get the link to the log
+var link = string.Format(urlFormat, id);
+_clipboardService.SetText(link);
+ShowNotifications("Report link copied to clipboard");
+```
+
+* Now a person has the link to the uploaded log (this example copies it to clipboard as well)
+* It can be shared to the Bug report or just be posted to the chat.
+Link redirects to this log like this:
+![image](screenshots/screenshot_log.png)
+
+Now your teammates can see this log and it will be kept there like this:
+![image](screenshots/screenshot_main.png)
+
+Yes, there are tons of tools such as Log Stash, Kibana but this one
+ - does only one simple common task
+ - deployed within seconds and completely free
+ - easy to be used by anyone in your team
+ 
+## Description
+
+It is also an example of using such patterns and tools as:
+* [Flutter Bloc](https://pub.dev/packages/flutter_bloc)
+* [Firebase Firestore](https://firebase.google.com/docs/firestore)
+* simple Dart backend (with [shelf](https://pub.dev/packages/shelf) and Firebase)
+* shared Dart code project usage with Docker
+* [Firebase Flutter app hosting](https://firebase.google.com/docs/hosting)
+
+Contains 3 projects:
 - log_keep
 - log_keep_back
 - log_keep_shared
 
 Backend part log_keep_back provides an API to upload logs and to retrieve links to share them.  
-Client part log_keep is used to view logs.
+Client part log_keep is used to view and/or upload logs.
 
-Storage is based on Firestore (but anything else can be used too).
+Storage uses Firestore (but anything else can be used too).
 
 Folders structure is based on https://hub.docker.com/r/google/dart-runtime-base
-in order to use shared code in log_keep_shared both on client and server sides.
+in order to use shared code in log_keep_shared both on the client and server sides.
 
-## How to use
+## How to setup
 
 ### Firebase Account
 
 * Create one at https://firebase.google.com/
 * Add apps that you need (iOS/Android/Web)
+* Enable Firestore and create empty collections ("projects" and "logs")
 
 ### Setup it up in your project
 
@@ -69,9 +119,6 @@ Instructions on how to build & deploy server can also be found here https://hub.
 
 ## To build and host Web client use
 * cd log_keep
-* flutter build web  
+* flutter build web 
+* init and login using Firebase CLI 
 * firebase deploy --only hosting
-
-## Screenshots
-* https://monosnap.com/file/lsKyrrDvDedPPyPkIufYu9sxZZrq3M
-* https://monosnap.com/file/a78x0Rjkt0OHkp9G63E3G3o4azg6ys
