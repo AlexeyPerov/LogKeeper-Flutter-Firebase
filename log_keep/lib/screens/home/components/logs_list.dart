@@ -9,12 +9,12 @@ import 'package:log_keep/bloc/log_infos/log_infos.dart';
 import 'package:log_keep/bloc/projects/projects.dart';
 import 'package:log_keep/common/utilities/navigator_utilities.dart';
 import 'package:log_keep/common/utilities/web_utilities.dart';
-import 'package:log_keep/common/widgets/conditional_widget.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/screens/details/details_screen.dart';
 import 'package:log_keep/screens/details/services/log_deletion_service.dart';
 import 'package:log_keep_shared/log_keep_shared.dart';
 import 'package:log_keep/common/utilities/string_extensions.dart';
+import 'package:proviso/proviso.dart';
 
 class LogsList extends StatefulWidget {
   final List<ProjectInfo> projects;
@@ -212,18 +212,18 @@ class _LogsListState extends State<LogsList> {
                   style: dateStyle,
                 ),
                 SizedBox(width: 10.0),
-                ConditionalWidget(
+                ConditionWidget(
                   condition: kIsWeb,
-                  child: Text(
+                  widget: Text(
                     logInfo.author,
                     maxLines: 1,
                     style: dateStyle,
                   ),
                 ),
                 Spacer(),
-                ConditionalWidget(
+                ConditionWidget(
                   condition: kIsWeb,
-                  child: LogCardMiniButton(
+                  widget: LogCardMiniButton(
                       icon: Icons.filter,
                       pressed: () => getIt<LogsRepository>()
                           .getLogById(logInfo.id)
@@ -231,9 +231,9 @@ class _LogsListState extends State<LogsList> {
                               WebUtilities.openStringContentInNewPage(
                                   value.data.contents))),
                 ),
-                ConditionalWidget(
+                ConditionWidget(
                   condition: kIsWeb,
-                  child: LogCardMiniButton(
+                  widget: LogCardMiniButton(
                       icon: Icons.delete,
                       pressed: () => LogDeletionService.requestDeletion(
                           context, widget.selectedProject, logInfo)),

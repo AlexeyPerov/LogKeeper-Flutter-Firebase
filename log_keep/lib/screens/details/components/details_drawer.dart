@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:log_keep/app/configs.dart';
 import 'package:log_keep/common/utilities/web_utilities.dart';
 import 'package:log_keep/common/widgets/drawer_card.dart';
-import 'package:log_keep/common/widgets/conditional_widget.dart';
 import 'package:log_keep_shared/log_keep_shared.dart';
+import 'package:proviso/proviso.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailsDrawer extends StatelessWidget {
@@ -33,9 +33,9 @@ class DetailsDrawer extends StatelessWidget {
                 onTap: () {
                   WebUtilities.downloadStringAsDocument(log.data.contents);
                 }),
-            ConditionalWidget(
+            ConditionWidget(
               condition: !kIsWeb,
-              child: DrawerCard(
+              widget: DrawerCard(
                   text: 'COPY LINK',
                   color: Color(0xFFF5F7FB),
                   onTap: () {
