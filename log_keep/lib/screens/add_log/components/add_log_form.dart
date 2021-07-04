@@ -197,7 +197,7 @@ class _AddLogFormState extends State<AddLogForm> {
 
   void _addPressed(BuildContext context) {
     UIBlock.block(context,
-        loadingTextWidget: Text('Deleting..,'),
+        loadingTextWidget: Text('Deleting...'),
         backgroundColor: Colors.blueGrey);
 
     RepositoryProvider.of<LogsRepository>(context)
