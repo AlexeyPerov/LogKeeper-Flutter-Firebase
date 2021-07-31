@@ -122,3 +122,4 @@ app.*.symbols
 # Firebase
 **/.firebase/**
 **/.firebaserc
+firebaseConfig.js
