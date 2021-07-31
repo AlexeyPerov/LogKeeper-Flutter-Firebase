@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:log_keep/bloc/global/events_stream.dart';
 import 'package:log_keep/repositories/settings_repository.dart';
 import 'package:log_keep/screens/details/details_screen.dart';
@@ -8,6 +10,8 @@ import 'package:log_keep/screens/splash/splash_screen.dart';
 import 'package:log_keep/app/theme/themes.dart';
 import 'package:log_keep/common/utilities/routing/routing_extensions.dart';
 import 'app/app.dart';
+import 'app/options/app_options.dart';
+import 'app/theme/theme_constants.dart';
 
 void main() {
   getIt.registerSingleton<EventsStream>(CommonEventsStream());
@@ -22,11 +26,32 @@ class AppWidget extends StatelessWidget {
   AppWidget() : _appInitialization = App.initializeApp();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ModelBinding(
+    initialModel: AppOptions(
+      themeMode: ThemeMode.system,
+      textScaleFactor: systemTextScaleFactorOption,
+      timeDilation: timeDilation,
+      platform: defaultTargetPlatform,
+      isTestMode: false,
+    ),
+    child: Builder(
+      builder: (context) {
+        return _createApp(context);
+      },
+    ),
+  );
+
+  MaterialApp _createApp(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Log Keeper',
-      theme: theme(),
+      themeMode: AppOptions.of(context).themeMode,
+      theme: AppThemeData.lightThemeData.copyWith(
+        platform: AppOptions.of(context).platform,
+      ),
+      darkTheme: AppThemeData.darkThemeData.copyWith(
+        platform: AppOptions.of(context).platform,
+      ),
       initialRoute: HomeScreen.routeName,
       onGenerateRoute: _generateRoute,
     );

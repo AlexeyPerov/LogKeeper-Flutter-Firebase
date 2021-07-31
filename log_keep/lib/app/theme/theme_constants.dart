@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 const double kMinWebContainerWidth = 850;
+const double systemTextScaleFactorOption = -1;
 const kPrimaryColor = Color(0xFF64B5F6);
 const kPrimaryLightColor = Color(0xFFFFECDF);
 const kPrimaryGradientColor = LinearGradient(
