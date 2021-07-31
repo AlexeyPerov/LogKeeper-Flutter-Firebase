@@ -39,7 +39,7 @@ class DetailsScreen extends StatelessWidget {
       var width = MediaQuery.of(context).size.width;
       return Align(
         alignment: Alignment.center,
-        child: Container(width: min(850, width), child: LogView(log: log)),
+        child: Container(width: min(width - 150, width), child: LogView(log: log)),
       );
     } else {
       var height = MediaQuery.of(context).size.height;
