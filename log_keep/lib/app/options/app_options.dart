@@ -6,8 +6,6 @@ import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:log_keep/app/theme/theme_constants.dart';
 
-// based on https://github.com/flutter/gallery
-
 class AppOptions {
   const AppOptions({
     this.themeMode,
