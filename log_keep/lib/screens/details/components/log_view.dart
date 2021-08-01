@@ -33,26 +33,29 @@ class _LogViewState extends State<LogView> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       SizedBox(height: 2),
       Row(children: [
-        FlatButtonWithIcon(
-            icon: Icons.arrow_back_ios,
-            pressed: () =>
-                NavigatorUtilities.pop(context, (c) => HomeScreen())),
+        IconButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => NavigatorUtilities.pop(context, (c) => HomeScreen()),
+          icon: Icon(Icons.arrow_back_ios, size: 25),
+        ),
         Expanded(
           child: TextField(
             readOnly: true,
             controller: widget.linkController,
           ),
         ),
-        FlatButtonWithIcon(
-            icon: Icons.delete,
-            pressed: () => {
-                  LogDeletionService.performDeletion(
-                          context, widget.log.project, widget.log.info)
-                      .whenComplete(() => {
-                            NavigatorUtilities.pushWithNoTransition(
-                                context, (_, __, ___) => HomeScreen())
-                          })
-                })
+        IconButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => {
+            LogDeletionService.performDeletion(
+                    context, widget.log.project, widget.log.info)
+                .whenComplete(() => {
+                      NavigatorUtilities.pushWithNoTransition(
+                          context, (_, __, ___) => HomeScreen())
+                    })
+          },
+          icon: Icon(Icons.delete, size: 25),
+        )
       ]),
       SizedBox(height: 5),
       Row(
@@ -80,11 +83,9 @@ class _LogViewState extends State<LogView> {
               minHeight: 10.0,
               maxHeight: 100.0,
             ),
-            child: SelectableText(
-              widget.log.info.title,
-              toolbarOptions: commonToolbarOptions(),
-              style: TextStyle(fontSize: 16)
-            ),
+            child: SelectableText(widget.log.info.title,
+                toolbarOptions: commonToolbarOptions(),
+                style: TextStyle(fontSize: 16)),
           ),
         ),
       ),
@@ -99,33 +100,5 @@ class _LogViewState extends State<LogView> {
         ),
       )
     ]);
-  }
-}
-
-class FlatButtonWithIcon extends StatelessWidget {
-  final IconData icon;
-  final Function pressed;
-
-  const FlatButtonWithIcon({Key key, this.icon, this.pressed})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 10),
-      child: SizedBox(
-        height: 40,
-        width: 40,
-        child: FlatButton(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(60),
-          ),
-          color: Colors.white,
-          padding: EdgeInsets.zero,
-          onPressed: pressed,
-          child: Icon(icon, size: 25),
-        ),
-      ),
-    );
   }
 }
