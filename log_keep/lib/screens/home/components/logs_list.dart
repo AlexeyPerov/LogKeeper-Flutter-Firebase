@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class _LogsListState extends State<LogsList> {
   @override
   Widget build(BuildContext context) {
     var totalHeight = MediaQuery.of(context).size.height;
-    var projectsListHeight = 200.0;
+    var projectsListHeight = 160.0;
 
     return ListView(
       children: <Widget>[
@@ -103,7 +104,7 @@ class _LogsListState extends State<LogsList> {
         height: height,
         width: 175.0,
         decoration: BoxDecoration(
-          color: selected ? kPrimaryColor : Color(0xFFF5F7FB),
+          color: selected ? kPrimaryColor : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [selected ? commonBoxShadow() : slightBoxShadow()],
         ),
@@ -117,7 +118,7 @@ class _LogsListState extends State<LogsList> {
                 projectInfo.project,
                 overflow: TextOverflow.fade,
                 maxLines: 2,
-                style: projectNameStyle,
+                //style: projectNameStyle,
               ),
             ),
             Padding(
@@ -133,7 +134,7 @@ class _LogsListState extends State<LogsList> {
 
                   return Text(
                     count,
-                    style: logsCountStyle,
+                    //style: logsCountStyle,
                   );
                 },
               ),
@@ -167,7 +168,8 @@ class _LogsListState extends State<LogsList> {
       margin: EdgeInsets.symmetric(horizontal: 30.0),
       padding: EdgeInsets.all(30.0),
       decoration: BoxDecoration(
-          color: Color(0xFFF5F7FB),
+          // color: Color(0xFFF5F7FB),
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(30.0),
           boxShadow: [minorBoxShadow()]),
       child: GestureDetector(
@@ -184,7 +186,7 @@ class _LogsListState extends State<LogsList> {
                 title.item1,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
-                style: titleMainStyle,
+                // style: titleMainStyle,
               ),
             ),
             SizedBox(height: 10.0),
@@ -194,22 +196,22 @@ class _LogsListState extends State<LogsList> {
                 title.item2,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
-                style: titleSecondaryStyle,
+                // style: titleSecondaryStyle,
               ),
             ),
-            SizedBox(height: 10.0),
+            SizedBox(height: 5.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 Text(
                   dateFormatter.format(logInfo.createdAt),
-                  style: dateStyle,
+                  // style: dateStyle,
                 ),
                 SizedBox(width: 10.0),
                 Text(
                   timeFormatter.format(logInfo.createdAt),
-                  style: dateStyle,
+                  // style: dateStyle,
                 ),
                 SizedBox(width: 10.0),
                 ConditionWidget(
@@ -217,7 +219,7 @@ class _LogsListState extends State<LogsList> {
                   widget: Text(
                     logInfo.author,
                     maxLines: 1,
-                    style: dateStyle,
+                    // style: dateStyle,
                   ),
                 ),
                 Spacer(),

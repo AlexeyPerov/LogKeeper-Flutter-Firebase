@@ -28,7 +28,7 @@ class AppWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ModelBinding(
     initialModel: AppOptions(
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       textScaleFactor: systemTextScaleFactorOption,
       timeDilation: timeDilation,
       platform: defaultTargetPlatform,

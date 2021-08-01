@@ -57,24 +57,25 @@ class _LogViewState extends State<LogView> {
           icon: Icon(Icons.delete, size: 25),
         )
       ]),
-      SizedBox(height: 5),
+      SizedBox(height: 20),
       Row(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(left: 10),
+            padding: EdgeInsets.only(left: 20),
             child: Text(
               dateFormatter.format(widget.log.info.createdAt) +
                   ' ' +
                   timeFormatter.format(widget.log.info.createdAt),
-              style: subHeaderTextStyle,
+              //style: subHeaderTextStyle,
             ),
           ),
           Padding(
             padding: EdgeInsets.only(left: 10),
-            child: Text(widget.log.info.author, style: subHeaderTextStyle),
+            child: Text(widget.log.info.author, /*style: subHeaderTextStyle*/),
           )
         ],
       ),
+      SizedBox(height: 20),
       Padding(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Scrollbar(
@@ -89,6 +90,7 @@ class _LogViewState extends State<LogView> {
           ),
         ),
       ),
+      SizedBox(height: 10),
       Expanded(
         child: Padding(
           padding: EdgeInsets.only(
