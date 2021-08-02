@@ -1,5 +1,3 @@
-import 'dart:math';
-import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -82,17 +80,6 @@ class _LogsListState extends State<LogsList> {
 
   Widget _projectCard(int index, double height, ProjectInfo projectInfo) {
     var selected = widget.selectedProject == projectInfo.project;
-    var projectNameStyle = TextStyle(
-      color: selected ? Colors.white : Color(0xFFAFB4C6),
-      fontSize: 28.0,
-      fontWeight: FontWeight.bold,
-    );
-
-    var logsCountStyle = TextStyle(
-      color: selected ? Colors.white : Colors.black,
-      fontSize: 25.0,
-      fontWeight: FontWeight.bold,
-    );
 
     return GestureDetector(
       onTap: () {
@@ -147,22 +134,6 @@ class _LogsListState extends State<LogsList> {
 
   Widget _logCard(BuildContext context, LogInfoEntity logInfo) {
     var title = logInfo.title.splitWordsByLength(kIsWeb ? 64 : 32);
-    var titleMainStyle = const TextStyle(
-      color: Colors.black,
-      fontSize: 18.0,
-      decoration: TextDecoration.underline,
-      fontWeight: FontWeight.w600,
-    );
-    var titleSecondaryStyle = const TextStyle(
-      color: Colors.black,
-      fontSize: 14.0,
-      fontWeight: FontWeight.w300,
-    );
-    var dateStyle = const TextStyle(
-      color: Color(0xFFAFB4C6),
-      fontSize: 18.0,
-      fontWeight: FontWeight.w500,
-    );
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 30.0),

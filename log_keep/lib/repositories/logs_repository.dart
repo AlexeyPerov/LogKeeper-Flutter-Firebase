@@ -209,3 +209,17 @@ ProjectInfo get defaultProjectInfo {
 Stream<int> defaultStream() async* {
   yield 0;
 }
+
+class LogAnalysisEntity {
+  final LogEntity originalLog;
+  final List<LogLine> lines;
+
+  LogAnalysisEntity(this.originalLog, this.lines);
+}
+
+class LogLine {
+  final String contents;
+  final bool alarm;
+
+  LogLine(this.contents, this.alarm);
+}

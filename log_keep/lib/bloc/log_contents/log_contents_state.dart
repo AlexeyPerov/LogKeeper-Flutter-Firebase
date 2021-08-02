@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:log_keep_shared/log_keep_shared.dart';
+import 'package:log_keep/repositories/logs_repository.dart';
 
 abstract class LogContentsState extends Equatable {
   @override
@@ -7,7 +7,7 @@ abstract class LogContentsState extends Equatable {
 }
 
 class LogContentsLoaded extends LogContentsState {
-  final LogEntity log;
+  final LogAnalysisEntity log;
 
   LogContentsLoaded(this.log);
 

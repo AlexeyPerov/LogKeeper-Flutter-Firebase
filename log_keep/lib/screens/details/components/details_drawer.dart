@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:log_keep/app/configs.dart';
 import 'package:log_keep/common/utilities/web_utilities.dart';
 import 'package:log_keep/common/widgets/drawer_card.dart';
+import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep_shared/log_keep_shared.dart';
 import 'package:proviso/proviso.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailsDrawer extends StatelessWidget {
-  final LogEntity log;
+  final LogAnalysisEntity log;
 
   DetailsDrawer({Key key, this.log}) : super(key: key);
 
@@ -25,13 +26,13 @@ class DetailsDrawer extends StatelessWidget {
                 text: 'OPEN IN NEW HTML PAGE',
                 color: Color(0xFFF5F7FB),
                 onTap: () {
-                  WebUtilities.openStringContentInNewPage(log.data.contents);
+                  WebUtilities.openStringContentInNewPage(log.originalLog.data.contents);
                 }),
             DrawerCard(
                 text: 'DOWNLOAD',
                 color: Color(0xFFF5F7FB),
                 onTap: () {
-                  WebUtilities.downloadStringAsDocument(log.data.contents);
+                  WebUtilities.downloadStringAsDocument(log.originalLog.data.contents);
                 }),
             ConditionWidget(
               condition: !kIsWeb,
@@ -50,7 +51,7 @@ class DetailsDrawer extends StatelessWidget {
                       '/data~2F' +
                       logContentsCollection +
                       '~2F' +
-                      log.data.id;
+                      log.originalLog.data.id;
                   if (await canLaunch(url)) {
                     await launch(url);
                   } else {
@@ -61,7 +62,7 @@ class DetailsDrawer extends StatelessWidget {
                 }),
             Padding(
               padding: EdgeInsets.only(left: 20, top: 5, bottom: 5),
-              child: Text('ID:' + log.info.id,
+              child: Text('ID:' + log.originalLog.info.id,
                   style: TextStyle(
                     color: Color(0xFFAFB4C6),
                     fontSize: 12.0,
@@ -73,7 +74,7 @@ class DetailsDrawer extends StatelessWidget {
   }
 
   void _copyLinkPressed(BuildContext context) {
-    ClipboardManager.copyToClipBoard(serverUrlFormat() + log.info.id)
+    ClipboardManager.copyToClipBoard(serverUrlFormat() + log.originalLog.info.id)
         .then((result) {
       final snackBar = SnackBar(content: Text('Copied to Clipboard'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);

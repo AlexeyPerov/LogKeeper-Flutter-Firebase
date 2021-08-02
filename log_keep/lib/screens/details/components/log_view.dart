@@ -3,18 +3,18 @@ import 'package:log_keep/app/configs.dart';
 import 'package:log_keep/app/theme/theme_constants.dart';
 import 'package:log_keep/app/theme/themes.dart';
 import 'package:log_keep/common/utilities/navigator_utilities.dart';
+import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/screens/details/services/log_deletion_service.dart';
-import 'package:log_keep_shared/log_keep_shared.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
 import 'log_contents_view.dart';
 
 class LogView extends StatefulWidget {
-  final LogEntity log;
+  final LogAnalysisEntity log;
   final TextEditingController linkController;
 
   LogView({Key key, @required this.log})
       : this.linkController =
-            new TextEditingController(text: serverUrlFormat() + log.info.id),
+            new TextEditingController(text: serverUrlFormat() + log.originalLog.info.id),
         super(key: key);
 
   @override
@@ -24,12 +24,6 @@ class LogView extends StatefulWidget {
 class _LogViewState extends State<LogView> {
   @override
   Widget build(BuildContext context) {
-    var subHeaderTextStyle = TextStyle(
-      color: Color(0xFFAFB4C6),
-      fontSize: 12.0,
-      fontWeight: FontWeight.w500,
-    );
-
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       SizedBox(height: 2),
       Row(children: [
@@ -48,7 +42,7 @@ class _LogViewState extends State<LogView> {
           padding: EdgeInsets.zero,
           onPressed: () => {
             LogDeletionService.performDeletion(
-                    context, widget.log.project, widget.log.info)
+                    context, widget.log.originalLog.project, widget.log.originalLog.info)
                 .whenComplete(() => {
                       NavigatorUtilities.pushWithNoTransition(
                           context, (_, __, ___) => HomeScreen())
@@ -63,15 +57,15 @@ class _LogViewState extends State<LogView> {
           Padding(
             padding: EdgeInsets.only(left: 20),
             child: Text(
-              dateFormatter.format(widget.log.info.createdAt) +
+              dateFormatter.format(widget.log.originalLog.info.createdAt) +
                   ' ' +
-                  timeFormatter.format(widget.log.info.createdAt),
+                  timeFormatter.format(widget.log.originalLog.info.createdAt),
               //style: subHeaderTextStyle,
             ),
           ),
           Padding(
             padding: EdgeInsets.only(left: 10),
-            child: Text(widget.log.info.author, /*style: subHeaderTextStyle*/),
+            child: Text(widget.log.originalLog.info.author, /*style: subHeaderTextStyle*/),
           )
         ],
       ),
@@ -84,7 +78,7 @@ class _LogViewState extends State<LogView> {
               minHeight: 10.0,
               maxHeight: 100.0,
             ),
-            child: SelectableText(widget.log.info.title,
+            child: SelectableText(widget.log.originalLog.info.title,
                 toolbarOptions: commonToolbarOptions(),
                 style: TextStyle(fontSize: 16)),
           ),
@@ -98,7 +92,7 @@ class _LogViewState extends State<LogView> {
             left: 20,
             right: 20,
           ),
-          child: LogContentsView(contents: widget.log.data.contents),
+          child: LogContentsView(log: widget.log),
         ),
       )
     ]);

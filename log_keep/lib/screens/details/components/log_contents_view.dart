@@ -1,23 +1,15 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:log_keep/app/theme/themes.dart';
+import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:web_browser/web_browser.dart';
 import 'package:universal_html/html.dart' as html;
 
 class LogContentsView extends StatefulWidget {
-  final String contents;
-  List<String> lines;
-  List<String> logs;
+  final LogAnalysisEntity log;
 
-  LogContentsView({Key key, @required this.contents}) : super(key: key) {
-    var ls = new LineSplitter();
-    lines = ls.convert(contents);
-
-    logs = contents.split(RegExp(r"\|[0-9]+\|"));
-  }
+  LogContentsView({Key key, @required this.log}) : super(key: key) ;
 
   @override
   _LogContentsViewState createState() => _LogContentsViewState();
@@ -30,7 +22,7 @@ class _LogContentsViewState extends State<LogContentsView> {
   Widget build(BuildContext context) {
     if (_mode == 0) {
       final contents =
-          '<html><body><pre>${widget.contents}</pre></body></html>';
+          '<html><body><pre>${widget.log.originalLog.data.contents}</pre></body></html>';
       final blob = html.Blob([contents], 'text/html');
       final url = html.Url.createObjectUrlFromBlob(blob);
       var width = MediaQuery.of(context).size.width;
@@ -45,27 +37,6 @@ class _LogContentsViewState extends State<LogContentsView> {
             interactionSettings:
                 WebBrowserInteractionSettings(topBar: null, bottomBar: null)),
       );
-    } else if (_mode == 1) {
-      var textStyle = TextStyle(
-          height: 2,
-          fontSize: 14.0,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.5,
-          wordSpacing: 1);
-
-      return ListView.builder(
-        shrinkWrap: true,
-        scrollDirection: Axis.vertical,
-        itemCount: widget.lines.length + 1,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == widget.lines.length) {
-            return SizedBox(height: 80);
-          }
-
-          var log = widget.lines[index];
-          return Text(log, style: textStyle);
-        },
-      );
     } else {
       var textStyle = TextStyle(
           height: 1,
@@ -76,17 +47,17 @@ class _LogContentsViewState extends State<LogContentsView> {
       return ListView.builder(
         shrinkWrap: true,
         scrollDirection: Axis.vertical,
-        itemCount: widget.logs.length + 1,
+        itemCount: widget.log.lines.length + 1,
         itemBuilder: (BuildContext context, int index) {
-          if (index == widget.logs.length) {
+          if (index == widget.log.lines.length) {
             return SizedBox(height: 80);
           }
 
-          var log = widget.logs[index];
-          if (log.length > 300) {
+          var line = widget.log.lines[index];
+          if (line.contents.length > 300) {
             return Text("LONG LINE", style: textStyle);
           } else {
-            return Text(log, style: textStyle);
+            return Text(line.contents, style: textStyle);
           }
         },
       );

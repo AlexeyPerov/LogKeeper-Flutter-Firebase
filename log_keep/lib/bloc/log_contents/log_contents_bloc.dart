@@ -20,9 +20,16 @@ class LogContentsBloc extends Bloc<LogContentsEvent, LogContentsState> {
 
   Stream<LogContentsState> _mapLoadLogContentsToState(
       LoadLogContents event) async* {
-    logsRepository
-        .getLogById(event.id)
-        .then((log) => {add(LogContentsUpdated(log))});
+    var log = await logsRepository.getLogById(event.id);
+
+    var linesRaw = log.data.contents.split(RegExp(r"\|[0-9]+\|"));
+    var lines = List<LogLine>.empty(growable: true);
+
+    for(var rawLine in linesRaw) {
+      lines.add(LogLine(rawLine, rawLine.contains("Exception")));
+    }
+
+    add(LogContentsUpdated(LogAnalysisEntity(log, lines)));
   }
 
   Stream<LogContentsState> _mapLogContentsUpdateToState(

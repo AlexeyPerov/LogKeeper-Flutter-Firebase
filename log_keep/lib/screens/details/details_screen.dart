@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:log_keep/app/app.dart';
 import 'package:log_keep/bloc/log_contents/log_contents.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
-import 'package:log_keep_shared/log_keep_shared.dart';
 import 'components/details_drawer.dart';
 import 'components/log_view.dart';
 
@@ -34,12 +33,13 @@ class DetailsScreen extends StatelessWidget {
     }));
   }
 
-  Widget getWidgetForLoadedState(BuildContext context, LogEntity log) {
+  Widget getWidgetForLoadedState(BuildContext context, LogAnalysisEntity log) {
     if (kIsWeb) {
       var width = MediaQuery.of(context).size.width;
+      var targetWidth = width > 1024 ? min(width - 150, width) : width;
       return Align(
         alignment: Alignment.center,
-        child: Container(width: min(width - 150, width), child: LogView(log: log)),
+        child: Container(width: targetWidth, child: LogView(log: log)),
       );
     } else {
       var height = MediaQuery.of(context).size.height;
