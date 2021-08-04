@@ -44,7 +44,8 @@ class _LogsListState extends State<LogsList> {
               if (index == 0) {
                 return SizedBox(width: 20.0);
               }
-              return _projectCard(index - 1, projectsListHeight, widget.projects[index - 1]);
+              return _projectCard(
+                  index - 1, projectsListHeight, widget.projects[index - 1]);
             },
           ),
         ),
@@ -139,7 +140,6 @@ class _LogsListState extends State<LogsList> {
       margin: EdgeInsets.symmetric(horizontal: 30.0),
       padding: EdgeInsets.all(30.0),
       decoration: BoxDecoration(
-          // color: Color(0xFFF5F7FB),
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(30.0),
           boxShadow: [minorBoxShadow()]),
@@ -231,17 +231,9 @@ class LogCardMiniButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 10, top: 10),
       child: SizedBox(
-        height: 30,
-        width: 30,
-        child: FlatButton(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(60),
-          ),
-          padding: EdgeInsets.zero,
-          onPressed: pressed,
-          child: Icon(icon, size: 25),
-        ),
-      ),
+          height: 30,
+          width: 30,
+          child: IconButton(icon: Icon(icon, size: 25), onPressed: pressed)),
     );
   }
 }

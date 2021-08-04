@@ -49,19 +49,12 @@ class _AddLogFormState extends State<AddLogForm> {
           child: Row(
             children: [
               SizedBox(
-                height: 40,
-                width: 40,
-                child: FlatButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(60),
-                  ),
-                  color: Colors.white,
-                  padding: EdgeInsets.zero,
-                  onPressed: () => NavigatorUtilities.pushAndRemoveUntil(
-                      context, (c) => HomeScreen()),
-                  child: Icon(Icons.arrow_back_ios, size: 25),
-                ),
-              )
+                  height: 40,
+                  width: 40,
+                  child: IconButton(
+                      icon: Icon(Icons.arrow_back_ios, size: 25),
+                      onPressed: () => NavigatorUtilities.pushAndRemoveUntil(
+                          context, (c) => HomeScreen())))
             ],
           ),
         ),
@@ -210,8 +203,7 @@ class _AddLogFormState extends State<AddLogForm> {
 
   void _additionCompleted(BuildContext context) {
     UIBlock.unblock(context);
-    NavigatorUtilities.pushAndRemoveUntil(
-        context, (c) => HomeScreen());
+    NavigatorUtilities.pushAndRemoveUntil(context, (c) => HomeScreen());
   }
 
   void _copyLink(BuildContext context, String id) {

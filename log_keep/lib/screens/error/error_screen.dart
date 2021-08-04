@@ -14,24 +14,18 @@ class ErrorScreen extends StatelessWidget {
             children: [
               Icon(Icons.error, size: 142),
               SizedBox(height: 30),
-              FlatButton(
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 25),
-                shape: const RoundedRectangleBorder(
-                  side: BorderSide(color: Color(0xFF293047), width: 2),
-                  borderRadius: BorderRadius.all(Radius.circular(100)),
-                ),
+              TextButton(
+                  child: Text(
+                "Back To Home".toUpperCase(),
+                style: Theme.of(context)
+                    .textTheme
+                    .headline6
+                    .copyWith(fontWeight: FontWeight.bold),
+              ),
                 onPressed: () {
                   NavigatorUtilities.pushAndRemoveUntil(
                       context, (c) => HomeScreen());
-                },
-                child: Text(
-                  "Back To Home".toUpperCase(),
-                  style: Theme.of(context)
-                      .textTheme
-                      .headline6
-                      .copyWith(fontWeight: FontWeight.bold),
-                ),
-              )
+                }),
             ],
           ),
         ));
