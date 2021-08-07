@@ -102,12 +102,8 @@ class _LogsListState extends State<LogsList> {
           children: <Widget>[
             Padding(
               padding: EdgeInsets.all(20.0),
-              child: Text(
-                projectInfo.project,
-                overflow: TextOverflow.fade,
-                maxLines: 2,
-                //style: projectNameStyle,
-              ),
+              child: Text(projectInfo.project,
+                  overflow: TextOverflow.fade, maxLines: 2),
             ),
             Padding(
               padding: EdgeInsets.only(left: 20.0, bottom: 20.0),
@@ -120,10 +116,7 @@ class _LogsListState extends State<LogsList> {
                     count = snapshot.data.toString();
                   }
 
-                  return Text(
-                    count,
-                    //style: logsCountStyle,
-                  );
+                  return Text(count);
                 },
               ),
             ),
@@ -153,45 +146,27 @@ class _LogsListState extends State<LogsList> {
           children: <Widget>[
             Align(
               alignment: Alignment.topLeft,
-              child: Text(
-                title.item1,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                // style: titleMainStyle,
-              ),
+              child: Text(title.item1,
+                  overflow: TextOverflow.ellipsis, maxLines: 1),
             ),
             SizedBox(height: 10.0),
             Align(
               alignment: Alignment.topLeft,
-              child: Text(
-                title.item2,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                // style: titleSecondaryStyle,
-              ),
+              child: Text(title.item2,
+                  overflow: TextOverflow.ellipsis, maxLines: 1),
             ),
             SizedBox(height: 5.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Text(
-                  dateFormatter.format(logInfo.createdAt),
-                  // style: dateStyle,
-                ),
+                Text(dateFormatter.format(logInfo.createdAt)),
                 SizedBox(width: 10.0),
-                Text(
-                  timeFormatter.format(logInfo.createdAt),
-                  // style: dateStyle,
-                ),
+                Text(timeFormatter.format(logInfo.createdAt)),
                 SizedBox(width: 10.0),
                 ConditionWidget(
                   condition: kIsWeb,
-                  widget: Text(
-                    logInfo.author,
-                    maxLines: 1,
-                    // style: dateStyle,
-                  ),
+                  widget: Text(logInfo.author, maxLines: 1),
                 ),
                 Spacer(),
                 ConditionWidget(

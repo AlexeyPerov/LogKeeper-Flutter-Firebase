@@ -8,19 +8,18 @@ import 'package:universal_html/html.dart' as html;
 
 class LogContentsView extends StatefulWidget {
   final LogAnalysisEntity log;
+  final int mode;
 
-  LogContentsView({Key key, @required this.log}) : super(key: key) ;
+  LogContentsView({Key key, @required this.log, @required this.mode}) : super(key: key) ;
 
   @override
   _LogContentsViewState createState() => _LogContentsViewState();
 }
 
 class _LogContentsViewState extends State<LogContentsView> {
-  int _mode = 2;
-
   @override
   Widget build(BuildContext context) {
-    if (_mode == 0) {
+    if (widget.mode == 0) {
       final contents =
           '<html><body><pre>${widget.log.originalLog.data.contents}</pre></body></html>';
       final blob = html.Blob([contents], 'text/html');
@@ -35,7 +34,7 @@ class _LogContentsViewState extends State<LogContentsView> {
             iframeSettings: WebBrowserIFrameSettings(
                 width: '"' + browserWidth.toString() + '"'),
             interactionSettings:
-                WebBrowserInteractionSettings(topBar: null, bottomBar: null)),
+            WebBrowserInteractionSettings(topBar: null, bottomBar: null)),
       );
     } else {
       var textStyle = TextStyle(

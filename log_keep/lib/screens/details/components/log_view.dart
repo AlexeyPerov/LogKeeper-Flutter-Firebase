@@ -22,6 +22,8 @@ class LogView extends StatefulWidget {
 }
 
 class _LogViewState extends State<LogView> {
+  int _mode = 1;
+
   @override
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -85,6 +87,8 @@ class _LogViewState extends State<LogView> {
         ),
       ),
       SizedBox(height: 10),
+      _buildModesList(),
+      SizedBox(height: 10),
       Expanded(
         child: Padding(
           padding: EdgeInsets.only(
@@ -92,9 +96,58 @@ class _LogViewState extends State<LogView> {
             left: 20,
             right: 20,
           ),
-          child: LogContentsView(log: widget.log),
+          child: LogContentsView(log: widget.log, mode: _mode),
         ),
       )
     ]);
+  }
+
+  Widget _buildModesList() {
+    return Row(children: [
+      _modeCard("Raw", 0),
+      _modeCard("List", 1),
+    ],);
+  }
+
+  Widget _modeCard(String title, int index) {
+    var selected = _mode == index;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _mode = index;
+        });
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
+        height: 60.0,
+        width: 100.0,
+        decoration: BoxDecoration(
+          color: selected ? kPrimaryColor : Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(20.0),
+          boxShadow: [selected ? commonBoxShadow() : slightBoxShadow()],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(5.0),
+              child: Text(
+                  title,
+                  overflow: TextOverflow.fade,
+                  maxLines: 2
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 5.0, bottom: 5.0),
+              child: Text(
+                  ""
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
