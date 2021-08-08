@@ -213,8 +213,9 @@ Stream<int> defaultStream() async* {
 class LogAnalysisEntity {
   final LogEntity originalLog;
   final List<LogLine> lines;
+  final int alarmsCount;
 
-  LogAnalysisEntity(this.originalLog, this.lines);
+  LogAnalysisEntity(this.originalLog, this.lines, this.alarmsCount);
 }
 
 class LogLine {

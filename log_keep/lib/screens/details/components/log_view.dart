@@ -13,8 +13,8 @@ class LogView extends StatefulWidget {
   final TextEditingController linkController;
 
   LogView({Key key, @required this.log})
-      : this.linkController =
-            new TextEditingController(text: serverUrlFormat() + log.originalLog.info.id),
+      : this.linkController = new TextEditingController(
+            text: serverUrlFormat() + log.originalLog.info.id),
         super(key: key);
 
   @override
@@ -22,7 +22,7 @@ class LogView extends StatefulWidget {
 }
 
 class _LogViewState extends State<LogView> {
-  int _mode = 1;
+  int _mode = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +43,8 @@ class _LogViewState extends State<LogView> {
         IconButton(
           padding: EdgeInsets.zero,
           onPressed: () => {
-            LogDeletionService.performDeletion(
-                    context, widget.log.originalLog.project, widget.log.originalLog.info)
+            LogDeletionService.performDeletion(context,
+                    widget.log.originalLog.project, widget.log.originalLog.info)
                 .whenComplete(() => {
                       NavigatorUtilities.pushWithNoTransition(
                           context, (_, __, ___) => HomeScreen())
@@ -58,16 +58,16 @@ class _LogViewState extends State<LogView> {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.only(left: 20),
-            child: Text(
-              dateFormatter.format(widget.log.originalLog.info.createdAt) +
-                  ' ' +
-                  timeFormatter.format(widget.log.originalLog.info.createdAt),
-              //style: subHeaderTextStyle,
-            ),
+            child: Text(dateFormatter
+                    .format(widget.log.originalLog.info.createdAt) +
+                ' ' +
+                timeFormatter.format(widget.log.originalLog.info.createdAt)),
           ),
           Padding(
             padding: EdgeInsets.only(left: 10),
-            child: Text(widget.log.originalLog.info.author, /*style: subHeaderTextStyle*/),
+            child: Text(
+              widget.log.originalLog.info.author, /*style: subHeaderTextStyle*/
+            ),
           )
         ],
       ),
@@ -86,9 +86,9 @@ class _LogViewState extends State<LogView> {
           ),
         ),
       ),
-      SizedBox(height: 10),
+      SizedBox(height: 5),
       _buildModesList(),
-      SizedBox(height: 10),
+      SizedBox(height: 5),
       Expanded(
         child: Padding(
           padding: EdgeInsets.only(
@@ -103,13 +103,17 @@ class _LogViewState extends State<LogView> {
   }
 
   Widget _buildModesList() {
-    return Row(children: [
-      _modeCard("Raw", 0),
-      _modeCard("List", 1),
-    ],);
+    return Row(
+      children: [
+        _modeCard(Icons.web, "Raw", 0, 0),
+        _modeCard(Icons.view_headline, "Logs", 1, widget.log.lines.length),
+        _modeCard(Icons.error_outline, "Alarms", 2, widget.log.alarmsCount)
+      ],
+    );
   }
 
-  Widget _modeCard(String title, int index) {
+  Widget _modeCard(
+      IconData icon, String title, int index, int additionalCountInfo) {
     var selected = _mode == index;
 
     return GestureDetector(
@@ -119,8 +123,8 @@ class _LogViewState extends State<LogView> {
         });
       },
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-        height: 60.0,
+        margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+        height: 80.0,
         width: 100.0,
         decoration: BoxDecoration(
           color: selected ? kPrimaryColor : Theme.of(context).cardColor,
@@ -132,18 +136,22 @@ class _LogViewState extends State<LogView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.all(5.0),
-              child: Text(
-                  title,
-                  overflow: TextOverflow.fade,
-                  maxLines: 2
-              ),
+              padding: EdgeInsets.all(15.0),
+              child: Text(title, overflow: TextOverflow.fade, maxLines: 2),
             ),
-            Padding(
-              padding: EdgeInsets.only(left: 5.0, bottom: 5.0),
-              child: Text(
-                  ""
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(left: 15.0, bottom: 10.0),
+                  child: Text(additionalCountInfo != 0
+                      ? additionalCountInfo.toString()
+                      : ""),
+                ),
+                Padding(
+                    padding: EdgeInsets.only(right: 15.0, bottom: 10.0),
+                    child: Icon(icon, size: 20))
+              ],
             ),
           ],
         ),

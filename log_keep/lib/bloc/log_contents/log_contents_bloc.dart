@@ -24,12 +24,24 @@ class LogContentsBloc extends Bloc<LogContentsEvent, LogContentsState> {
 
     var linesRaw = log.data.contents.split(RegExp(r"\|[0-9]+\|"));
     var lines = List<LogLine>.empty(growable: true);
+    var alarmsCount = 0;
 
-    for(var rawLine in linesRaw) {
-      lines.add(LogLine(rawLine, rawLine.contains("Exception")));
+    for (var rawLine in linesRaw) {
+      var isAlarm = false;
+
+      isAlarm = rawLine.contains("Exception") ||
+          rawLine.contains("Error") ||
+          rawLine.contains("Warning") ||
+          rawLine.contains("Fail");
+
+      lines.add(LogLine(rawLine, isAlarm));
+
+      if (isAlarm) {
+        alarmsCount ++;
+      }
     }
 
-    add(LogContentsUpdated(LogAnalysisEntity(log, lines)));
+    add(LogContentsUpdated(LogAnalysisEntity(log, lines, alarmsCount)));
   }
 
   Stream<LogContentsState> _mapLogContentsUpdateToState(
