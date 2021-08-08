@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
+import 'package:proviso/proviso.dart';
 import 'package:web_browser/web_browser.dart';
 import 'package:universal_html/html.dart' as html;
 
@@ -18,24 +19,24 @@ class LogContentsView extends StatefulWidget {
 }
 
 class _LogContentsViewState extends State<LogContentsView> {
-  var lineFoldouts = Map<int, bool>();
-  var errorFoldouts = Map<int, bool>();
+  var _lineFoldouts = Map<int, bool>();
+  var _errorFoldouts = Map<int, bool>();
 
   @override
   Widget build(BuildContext context) {
     if (widget.mode == 1) {
-      return _buildLogListView(widget.log.lines, lineFoldouts);
+      return _buildLogListView(widget.log.lines, _lineFoldouts);
     } else if (widget.mode == 2) {
       return _buildLogListView(
           widget.log.lines.where((x) => x.alarm).toList(growable: false),
-          errorFoldouts);
+          _errorFoldouts);
     } else {
       return _buildWebRawView();
     }
   }
 
   Widget _buildLogListView(List<LogLine> lines, Map<int, bool> foldouts) {
-    var textStyle = TextStyle(
+    var textStyle = const TextStyle(
         height: 1.2, fontSize: 14.0, letterSpacing: 0.5, wordSpacing: 1);
 
     return ListView.builder(
@@ -48,12 +49,48 @@ class _LogContentsViewState extends State<LogContentsView> {
         }
 
         var line = lines[index];
-        if (line.contents.length > 300) {
-          // var folded = foldouts.containsKey(index) ? [index] : false;
-          return Text(line.contents.substring(0, 25) + "...", style: textStyle);
-        } else {
-          return Text(line.contents, style: textStyle);
-        }
+        var canBeFolded = line.contents.length > 100;
+        var longLine = canBeFolded && line.contents.length > 300;
+        var alarm = line.alarm;
+        var defaultUnfoldedValue = !longLine || alarm || !canBeFolded;
+        var unfolded = foldouts.containsKey(index)
+            ? foldouts[index]
+            : defaultUnfoldedValue;
+
+        var contents =
+            unfolded ? line.contents : (line.contents.substring(0, 25) + "...");
+
+        return Container(
+          decoration: BoxDecoration(
+              color: index % 2 != 0 ? Colors.white : Color(0xFFE6EBEB),
+              borderRadius: BorderRadius.circular(20.0)),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 10, left: 10),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(child: Text(contents, style: textStyle)),
+              ConditionWidget(condition: alarm, widget: Icon(Icons.whatshot)),
+              ConditionWidget(
+                  condition: canBeFolded,
+                  widget: ConditionWidget(
+                      condition: unfolded,
+                      widget: IconButton(
+                          icon: Icon(Icons.unfold_less),
+                          alignment: Alignment.topCenter,
+                          color: Colors.grey,
+                          padding: const EdgeInsets.only(right: 5),
+                          onPressed: () => setState(() {
+                                foldouts[index] = false;
+                              })),
+                      fallback: IconButton(
+                          icon: Icon(Icons.unfold_more),
+                          alignment: Alignment.topCenter,
+                          padding: const EdgeInsets.only(right: 5),
+                          onPressed: () => setState(() {
+                                foldouts[index] = true;
+                              }))))
+            ]),
+          ),
+        );
       },
     );
   }
