@@ -60,35 +60,46 @@ class _LogContentsViewState extends State<LogContentsView> {
         var contents =
             unfolded ? line.contents : (line.contents.substring(0, 25) + "...");
 
-        return Container(
-          decoration: BoxDecoration(
-              color: index % 2 != 0 ? Colors.white : Color(0xFFE6EBEB),
-              borderRadius: BorderRadius.circular(20.0)),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10, left: 10),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Expanded(child: Text(contents, style: textStyle)),
-              ConditionWidget(condition: alarm, widget: Icon(Icons.whatshot)),
-              ConditionWidget(
-                  condition: canBeFolded,
-                  widget: ConditionWidget(
-                      condition: unfolded,
-                      widget: IconButton(
-                          icon: Icon(Icons.unfold_less),
-                          alignment: Alignment.topCenter,
-                          color: Colors.grey,
-                          padding: const EdgeInsets.only(right: 5),
-                          onPressed: () => setState(() {
-                                foldouts[index] = false;
-                              })),
-                      fallback: IconButton(
-                          icon: Icon(Icons.unfold_more),
-                          alignment: Alignment.topCenter,
-                          padding: const EdgeInsets.only(right: 5),
-                          onPressed: () => setState(() {
-                                foldouts[index] = true;
-                              }))))
-            ]),
+        var backColor = index % 2 != 0 ? Colors.white : Color(0xFFE6EBEB);
+
+        return Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: Container(
+            decoration: BoxDecoration(
+                color: backColor, borderRadius: BorderRadius.circular(20.0)),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10, left: 10),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Expanded(child: Text(contents, style: textStyle)),
+                ConditionWidget(condition: alarm, widget: Icon(Icons.whatshot)),
+                ConditionWidget(
+                    condition: canBeFolded,
+                    widget: ConditionWidget(
+                        condition: unfolded,
+                        widget: IconButton(
+                            icon: Icon(Icons.unfold_less),
+                            alignment: Alignment.topCenter,
+                            color: Colors.grey,
+                            padding: const EdgeInsets.only(right: 5),
+                            onPressed: () => setState(() {
+                                  foldouts[index] = false;
+                                })),
+                        fallback: IconButton(
+                            icon: Icon(Icons.unfold_more),
+                            alignment: Alignment.topCenter,
+                            padding: const EdgeInsets.only(right: 5),
+                            onPressed: () => setState(() {
+                                  foldouts[index] = true;
+                                })))),
+                /*IconButton(
+                    icon: Icon(Icons.copy),
+                    alignment: Alignment.topCenter,
+                    padding: const EdgeInsets.only(right: 5),
+                    onPressed: () => setState(() {
+                      foldouts[index] = true;
+                    }))*/
+              ]),
+            ),
           ),
         );
       },

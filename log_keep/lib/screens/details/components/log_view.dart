@@ -27,53 +27,58 @@ class _LogViewState extends State<LogView> {
   @override
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      SizedBox(height: 2),
-      Row(children: [
-        IconButton(
-          padding: EdgeInsets.zero,
-          onPressed: () => NavigatorUtilities.pop(context, (c) => HomeScreen()),
-          icon: Icon(Icons.arrow_back_ios, size: 25),
-        ),
-        Expanded(
-          child: TextField(
-            readOnly: true,
-            controller: widget.linkController,
+      Padding(
+        padding: const EdgeInsets.only(left: 10.0),
+        child: Row(children: [
+          IconButton(
+            padding: EdgeInsets.zero,
+            onPressed: () => NavigatorUtilities.pop(context, (c) => HomeScreen()),
+            icon: Icon(Icons.arrow_back_ios, size: 25),
           ),
-        ),
-        IconButton(
-          padding: EdgeInsets.zero,
-          onPressed: () => {
-            LogDeletionService.performDeletion(context,
-                    widget.log.originalLog.project, widget.log.originalLog.info)
-                .whenComplete(() => {
-                      NavigatorUtilities.pushWithNoTransition(
-                          context, (_, __, ___) => HomeScreen())
-                    })
-          },
-          icon: Icon(Icons.delete, size: 25),
-        )
-      ]),
+          Expanded(
+            child: TextField(
+              readOnly: true,
+              controller: widget.linkController,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 15.0),
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => {
+                LogDeletionService.performDeletion(context,
+                        widget.log.originalLog.project, widget.log.originalLog.info)
+                    .whenComplete(() => {
+                          NavigatorUtilities.pushWithNoTransition(
+                              context, (_, __, ___) => HomeScreen())
+                        })
+              },
+              icon: Icon(Icons.delete, size: 25),
+            ),
+          )
+        ]),
+      ),
       SizedBox(height: 20),
       Row(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(left: 20),
+            padding: EdgeInsets.only(left: 10),
             child: Text(dateFormatter
                     .format(widget.log.originalLog.info.createdAt) +
                 ' ' +
-                timeFormatter.format(widget.log.originalLog.info.createdAt)),
+                timeFormatter.format(widget.log.originalLog.info.createdAt), style: TextStyle(fontSize: 14)),
           ),
           Padding(
             padding: EdgeInsets.only(left: 10),
             child: Text(
-              widget.log.originalLog.info.author, /*style: subHeaderTextStyle*/
+              widget.log.originalLog.info.author, style: TextStyle(fontSize: 14)
             ),
           )
         ],
       ),
-      SizedBox(height: 20),
+      SizedBox(height: 6),
       Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         child: Scrollbar(
           child: ConstrainedBox(
             constraints: new BoxConstraints(
@@ -82,18 +87,16 @@ class _LogViewState extends State<LogView> {
             ),
             child: SelectableText(widget.log.originalLog.info.title,
                 toolbarOptions: commonToolbarOptions(),
-                style: TextStyle(fontSize: 16)),
+                style: TextStyle(fontSize: 14)),
           ),
         ),
       ),
-      SizedBox(height: 5),
       _buildModesList(),
-      SizedBox(height: 5),
+      Divider(),
       Expanded(
         child: Padding(
           padding: EdgeInsets.only(
-            top: 20,
-            left: 20,
+            left: 10,
             right: 20,
           ),
           child: LogContentsView(log: widget.log, mode: _mode),
