@@ -1,3 +1,4 @@
+import 'package:fading_edge_scrollview/fading_edge_scrollview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,6 +28,8 @@ class LogsList extends StatefulWidget {
 }
 
 class _LogsListState extends State<LogsList> {
+  final _controller = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     var totalHeight = MediaQuery.of(context).size.height;
@@ -37,7 +40,9 @@ class _LogsListState extends State<LogsList> {
         SizedBox(height: 20.0),
         Container(
           height: projectsListHeight,
-          child: ListView.builder(
+          child: FadingEdgeScrollView.fromScrollView(
+              child: ListView.builder(
+            controller: _controller,
             scrollDirection: Axis.horizontal,
             itemCount: widget.projects.length + 1,
             itemBuilder: (BuildContext context, int index) {
@@ -47,8 +52,9 @@ class _LogsListState extends State<LogsList> {
               return _projectCard(
                   index - 1, projectsListHeight, widget.projects[index - 1]);
             },
-          ),
+          )),
         ),
+        Divider(),
         Container(
           height: totalHeight - projectsListHeight - 20,
           child: BlocBuilder<LogInfosBloc, LogInfosState>(
@@ -68,7 +74,7 @@ class _LogsListState extends State<LogsList> {
 
                   var log = list[index];
                   return Container(
-                      padding: EdgeInsets.only(top: 20),
+                      padding: EdgeInsets.only(bottom: 20),
                       child: _logCard(context, log));
                 },
               );

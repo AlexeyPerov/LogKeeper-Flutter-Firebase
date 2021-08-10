@@ -32,7 +32,8 @@ class _LogViewState extends State<LogView> {
         child: Row(children: [
           IconButton(
             padding: EdgeInsets.zero,
-            onPressed: () => NavigatorUtilities.pop(context, (c) => HomeScreen()),
+            onPressed: () =>
+                NavigatorUtilities.pop(context, (c) => HomeScreen()),
             icon: Icon(Icons.arrow_back_ios, size: 25),
           ),
           Expanded(
@@ -46,8 +47,10 @@ class _LogViewState extends State<LogView> {
             child: IconButton(
               padding: EdgeInsets.zero,
               onPressed: () => {
-                LogDeletionService.performDeletion(context,
-                        widget.log.originalLog.project, widget.log.originalLog.info)
+                LogDeletionService.performDeletion(
+                        context,
+                        widget.log.originalLog.project,
+                        widget.log.originalLog.info)
                     .whenComplete(() => {
                           NavigatorUtilities.pushWithNoTransition(
                               context, (_, __, ___) => HomeScreen())
@@ -63,16 +66,16 @@ class _LogViewState extends State<LogView> {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.only(left: 10),
-            child: Text(dateFormatter
-                    .format(widget.log.originalLog.info.createdAt) +
-                ' ' +
-                timeFormatter.format(widget.log.originalLog.info.createdAt), style: TextStyle(fontSize: 14)),
+            child: Text(
+                dateFormatter.format(widget.log.originalLog.info.createdAt) +
+                    ' ' +
+                    timeFormatter.format(widget.log.originalLog.info.createdAt),
+                style: TextStyle(fontSize: 14)),
           ),
           Padding(
             padding: EdgeInsets.only(left: 10),
-            child: Text(
-              widget.log.originalLog.info.author, style: TextStyle(fontSize: 14)
-            ),
+            child: Text(widget.log.originalLog.info.author,
+                style: TextStyle(fontSize: 14)),
           )
         ],
       ),

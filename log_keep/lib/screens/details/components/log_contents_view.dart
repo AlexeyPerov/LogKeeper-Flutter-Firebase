@@ -20,30 +20,26 @@ class LogContentsView extends StatefulWidget {
   _LogContentsViewState createState() => _LogContentsViewState();
 }
 
-class LineParams {
-  bool unfolded = false;
-  bool selectable = false;
-}
-
 class _LogContentsViewState extends State<LogContentsView> {
-  var _lineParams = Map<int, LineParams>();
-  var _errorLineParams = Map<int, LineParams>();
+  var _lineParams = Map<int, _LineOptions>();
+  var _errorLineParams = Map<int, _LineOptions>();
 
   @override
   Widget build(BuildContext context) {
     if (widget.mode == 1) {
-      return _buildLogListView(widget.log.lines, _lineParams);
+      return _buildLogListView(widget.log.lines, _lineParams, false);
     } else if (widget.mode == 2) {
       return _buildLogListView(
           widget.log.lines.where((x) => x.alarm).toList(growable: false),
-          _errorLineParams);
+          _errorLineParams,
+          true);
     } else {
       return _buildWebRawView();
     }
   }
 
-  Widget _buildLogListView(
-      List<LogLine> lines, Map<int, LineParams> lineParams) {
+  Widget _buildLogListView(List<LogLine> lines,
+      Map<int, _LineOptions> lineParams, bool selectableText) {
     var textStyle = const TextStyle(
         height: 1.2, fontSize: 14.0, letterSpacing: 0.5, wordSpacing: 1);
 
@@ -61,8 +57,9 @@ class _LogContentsViewState extends State<LogContentsView> {
         var longLine = canBeFolded && line.contents.length > 300;
         var alarm = line.alarm;
 
-        var selectable =
-            lineParams[index] != null ? lineParams[index].selectable : false;
+        var selectable = lineParams[index] != null
+            ? lineParams[index].selectable
+            : selectableText;
 
         var defaultUnfoldedValue = !longLine || alarm || !canBeFolded;
         var unfolded = lineParams[index] != null
@@ -103,7 +100,7 @@ class _LogContentsViewState extends State<LogContentsView> {
                             padding: const EdgeInsets.only(right: 5),
                             onPressed: () => setState(() {
                                   if (lineParams[index] == null) {
-                                    lineParams[index] = LineParams();
+                                    lineParams[index] = _LineOptions();
                                   }
                                   lineParams[index].unfolded = false;
                                 })),
@@ -113,36 +110,13 @@ class _LogContentsViewState extends State<LogContentsView> {
                             padding: const EdgeInsets.only(right: 5),
                             onPressed: () => setState(() {
                                   if (lineParams[index] == null) {
-                                    lineParams[index] = LineParams();
+                                    lineParams[index] = _LineOptions();
                                   }
                                   lineParams[index].unfolded = true;
                                 })))),
-                ConditionWidget(
-                  condition: selectable,
-                  widget: IconButton(
-                      icon: Icon(Icons.edit_attributes),
-                      alignment: Alignment.topCenter,
-                      padding: const EdgeInsets.only(right: 5),
-                      onPressed: () => setState(() {
-                            if (lineParams[index] == null) {
-                              lineParams[index] = LineParams();
-                            }
-                            lineParams[index].selectable = false;
-                          })),
-                  fallback: IconButton(
-                      icon: Icon(Icons.edit_attributes_outlined),
-                      alignment: Alignment.topCenter,
-                      color: Colors.grey,
-                      padding: const EdgeInsets.only(right: 5),
-                      onPressed: () => setState(() {
-                            if (lineParams[index] == null) {
-                              lineParams[index] = LineParams();
-                            }
-                            lineParams[index].selectable = true;
-                          })),
-                ),
                 IconButton(
                     icon: Icon(Icons.copy),
+                    color: Colors.grey,
                     alignment: Alignment.topCenter,
                     padding: const EdgeInsets.only(right: 5),
                     onPressed: () =>
@@ -177,4 +151,9 @@ class _LogContentsViewState extends State<LogContentsView> {
               WebBrowserInteractionSettings(topBar: null, bottomBar: null)),
     );
   }
+}
+
+class _LineOptions {
+  bool unfolded = false;
+  bool selectable = false;
 }

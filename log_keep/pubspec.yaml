@@ -30,6 +30,8 @@ dependencies:
 
   file_picker_cross: ^4.4.2
 
+  fading_edge_scrollview: ^2.0.0
+
   log_keep_shared:
     path: ../pkg/log_keep_shared
 
