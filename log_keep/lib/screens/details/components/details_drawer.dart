@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:clipboard_manager/clipboard_manager.dart';
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:log_keep/app/configs.dart';
@@ -7,7 +7,6 @@ import 'package:log_keep/common/utilities/web_utilities.dart';
 import 'package:log_keep/common/widgets/drawer_card.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep_shared/log_keep_shared.dart';
-import 'package:proviso/proviso.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailsDrawer extends StatelessWidget {
@@ -26,23 +25,22 @@ class DetailsDrawer extends StatelessWidget {
                 text: 'OPEN IN NEW HTML PAGE',
                 color: Color(0xFFF5F7FB),
                 onTap: () {
-                  WebUtilities.openStringContentInNewPage(log.originalLog.data.contents);
+                  WebUtilities.openStringContentInNewPage(
+                      log.originalLog.data.contents);
                 }),
             DrawerCard(
                 text: 'DOWNLOAD',
                 color: Color(0xFFF5F7FB),
                 onTap: () {
-                  WebUtilities.downloadStringAsDocument(log.originalLog.data.contents);
+                  WebUtilities.downloadStringAsDocument(
+                      log.originalLog.data.contents);
                 }),
-            ConditionWidget(
-              condition: !kIsWeb,
-              widget: DrawerCard(
-                  text: 'COPY LINK',
-                  color: Color(0xFFF5F7FB),
-                  onTap: () {
-                    _copyLinkPressed(context);
-                  }),
-            ),
+            DrawerCard(
+                text: 'COPY LINK',
+                color: Color(0xFFF5F7FB),
+                onTap: () {
+                  _copyLinkPressed(context);
+                }),
             DrawerCard(
                 text: 'OPEN IN DB',
                 color: Colors.orange[100],
@@ -74,7 +72,7 @@ class DetailsDrawer extends StatelessWidget {
   }
 
   void _copyLinkPressed(BuildContext context) {
-    ClipboardManager.copyToClipBoard(serverUrlFormat() + log.originalLog.info.id)
+    FlutterClipboard.copy(serverUrlFormat() + log.originalLog.info.id)
         .then((result) {
       final snackBar = SnackBar(content: Text('Copied to Clipboard'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);

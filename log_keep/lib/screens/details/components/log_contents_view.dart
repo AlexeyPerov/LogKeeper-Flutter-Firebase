@@ -1,7 +1,9 @@
 import 'dart:math';
 
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:log_keep/app/theme/themes.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:proviso/proviso.dart';
 import 'package:web_browser/web_browser.dart';
@@ -18,24 +20,30 @@ class LogContentsView extends StatefulWidget {
   _LogContentsViewState createState() => _LogContentsViewState();
 }
 
+class LineParams {
+  bool unfolded = false;
+  bool selectable = false;
+}
+
 class _LogContentsViewState extends State<LogContentsView> {
-  var _lineFoldouts = Map<int, bool>();
-  var _errorFoldouts = Map<int, bool>();
+  var _lineParams = Map<int, LineParams>();
+  var _errorLineParams = Map<int, LineParams>();
 
   @override
   Widget build(BuildContext context) {
     if (widget.mode == 1) {
-      return _buildLogListView(widget.log.lines, _lineFoldouts);
+      return _buildLogListView(widget.log.lines, _lineParams);
     } else if (widget.mode == 2) {
       return _buildLogListView(
           widget.log.lines.where((x) => x.alarm).toList(growable: false),
-          _errorFoldouts);
+          _errorLineParams);
     } else {
       return _buildWebRawView();
     }
   }
 
-  Widget _buildLogListView(List<LogLine> lines, Map<int, bool> foldouts) {
+  Widget _buildLogListView(
+      List<LogLine> lines, Map<int, LineParams> lineParams) {
     var textStyle = const TextStyle(
         height: 1.2, fontSize: 14.0, letterSpacing: 0.5, wordSpacing: 1);
 
@@ -52,9 +60,13 @@ class _LogContentsViewState extends State<LogContentsView> {
         var canBeFolded = line.contents.length > 100;
         var longLine = canBeFolded && line.contents.length > 300;
         var alarm = line.alarm;
+
+        var selectable =
+            lineParams[index] != null ? lineParams[index].selectable : false;
+
         var defaultUnfoldedValue = !longLine || alarm || !canBeFolded;
-        var unfolded = foldouts.containsKey(index)
-            ? foldouts[index]
+        var unfolded = lineParams[index] != null
+            ? lineParams[index].unfolded
             : defaultUnfoldedValue;
 
         var contents =
@@ -69,8 +81,16 @@ class _LogContentsViewState extends State<LogContentsView> {
                 color: backColor, borderRadius: BorderRadius.circular(20.0)),
             child: Padding(
               padding: const EdgeInsets.only(top: 10, left: 10),
-              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Expanded(child: Text(contents, style: textStyle)),
+              child:
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                ConditionWidget(
+                    condition: selectable,
+                    widget: Expanded(
+                        child: SelectableText(contents,
+                            style: textStyle,
+                            toolbarOptions: commonToolbarOptions())),
+                    fallback:
+                        Expanded(child: Text(contents, style: textStyle))),
                 ConditionWidget(condition: alarm, widget: Icon(Icons.whatshot)),
                 ConditionWidget(
                     condition: canBeFolded,
@@ -82,22 +102,55 @@ class _LogContentsViewState extends State<LogContentsView> {
                             color: Colors.grey,
                             padding: const EdgeInsets.only(right: 5),
                             onPressed: () => setState(() {
-                                  foldouts[index] = false;
+                                  if (lineParams[index] == null) {
+                                    lineParams[index] = LineParams();
+                                  }
+                                  lineParams[index].unfolded = false;
                                 })),
                         fallback: IconButton(
                             icon: Icon(Icons.unfold_more),
                             alignment: Alignment.topCenter,
                             padding: const EdgeInsets.only(right: 5),
                             onPressed: () => setState(() {
-                                  foldouts[index] = true;
+                                  if (lineParams[index] == null) {
+                                    lineParams[index] = LineParams();
+                                  }
+                                  lineParams[index].unfolded = true;
                                 })))),
-                /*IconButton(
+                ConditionWidget(
+                  condition: selectable,
+                  widget: IconButton(
+                      icon: Icon(Icons.edit_attributes),
+                      alignment: Alignment.topCenter,
+                      padding: const EdgeInsets.only(right: 5),
+                      onPressed: () => setState(() {
+                            if (lineParams[index] == null) {
+                              lineParams[index] = LineParams();
+                            }
+                            lineParams[index].selectable = false;
+                          })),
+                  fallback: IconButton(
+                      icon: Icon(Icons.edit_attributes_outlined),
+                      alignment: Alignment.topCenter,
+                      color: Colors.grey,
+                      padding: const EdgeInsets.only(right: 5),
+                      onPressed: () => setState(() {
+                            if (lineParams[index] == null) {
+                              lineParams[index] = LineParams();
+                            }
+                            lineParams[index].selectable = true;
+                          })),
+                ),
+                IconButton(
                     icon: Icon(Icons.copy),
                     alignment: Alignment.topCenter,
                     padding: const EdgeInsets.only(right: 5),
-                    onPressed: () => setState(() {
-                      foldouts[index] = true;
-                    }))*/
+                    onPressed: () =>
+                        FlutterClipboard.copy(line.contents).then((result) {
+                          final snackBar = SnackBar(
+                              content: Text('Log copied to Clipboard'));
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }))
               ]),
             ),
           ),

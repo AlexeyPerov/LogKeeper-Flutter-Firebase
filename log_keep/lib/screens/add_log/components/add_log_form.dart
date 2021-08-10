@@ -1,4 +1,4 @@
-import 'package:clipboard_manager/clipboard_manager.dart';
+import 'package:clipboard/clipboard.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -207,7 +207,7 @@ class _AddLogFormState extends State<AddLogForm> {
   }
 
   void _copyLink(BuildContext context, String id) {
-    ClipboardManager.copyToClipBoard(serverUrlFormat() + id).then((result) {
+    FlutterClipboard.copy(serverUrlFormat() + id).then((result) {
       final snackBar =
           SnackBar(content: Text('Link to the new log copied to Clipboard'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
