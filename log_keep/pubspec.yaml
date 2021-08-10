@@ -32,6 +32,8 @@ dependencies:
 
   fading_edge_scrollview: ^2.0.0
 
+  rflutter_alert: ^2.0.4
+
   log_keep_shared:
     path: ../pkg/log_keep_shared
 

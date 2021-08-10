@@ -4,15 +4,15 @@ import 'package:log_keep/app/theme/theme_constants.dart';
 import 'package:log_keep/app/theme/themes.dart';
 import 'package:log_keep/common/utilities/navigator_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
-import 'package:log_keep/screens/details/services/log_deletion_service.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
 import 'log_contents_view.dart';
 
 class LogView extends StatefulWidget {
   final LogAnalysisEntity log;
   final TextEditingController linkController;
+  final Function onDelete;
 
-  LogView({Key key, @required this.log})
+  LogView({Key key, @required this.log, @required this.onDelete})
       : this.linkController = new TextEditingController(
             text: serverUrlFormat() + log.originalLog.info.id),
         super(key: key);
@@ -46,15 +46,12 @@ class _LogViewState extends State<LogView> {
             padding: const EdgeInsets.only(right: 15.0),
             child: IconButton(
               padding: EdgeInsets.zero,
-              onPressed: () => {
-                LogDeletionService.performDeletion(
-                        context,
-                        widget.log.originalLog.project,
-                        widget.log.originalLog.info)
-                    .whenComplete(() => {
-                          NavigatorUtilities.pushWithNoTransition(
-                              context, (_, __, ___) => HomeScreen())
-                        })
+              onPressed: () {
+                if (_mode == 0)
+                  setState(() {
+                    _mode = 1;
+                  });
+                widget.onDelete();
               },
               icon: Icon(Icons.delete, size: 25),
             ),
