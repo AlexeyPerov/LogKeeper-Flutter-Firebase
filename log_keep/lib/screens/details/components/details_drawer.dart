@@ -74,7 +74,7 @@ class DetailsDrawer extends StatelessWidget {
   void _copyLinkPressed(BuildContext context) {
     FlutterClipboard.copy(serverUrlFormat() + log.originalLog.info.id)
         .then((result) {
-      final snackBar = SnackBar(content: Text('Copied to Clipboard'));
+      final snackBar = SnackBar(content: Text('Copied to clipboard'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     });
   }

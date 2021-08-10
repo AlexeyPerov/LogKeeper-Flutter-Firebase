@@ -1,3 +1,4 @@
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:log_keep/app/configs.dart';
 import 'package:log_keep/app/theme/theme_constants.dart';
@@ -43,6 +44,20 @@ class _LogViewState extends State<LogView> {
             ),
           ),
           Padding(
+              padding: const EdgeInsets.only(right: 15.0),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  FlutterClipboard.copy(widget.linkController.text).then((result) {
+                    final snackBar = SnackBar(
+                        content: Text('Link copied to clipboard'));
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  });
+                },
+                icon: Icon(Icons.copy, size: 25),
+              )
+          ),
+          Padding(
             padding: const EdgeInsets.only(right: 15.0),
             child: IconButton(
               padding: EdgeInsets.zero,
@@ -54,7 +69,7 @@ class _LogViewState extends State<LogView> {
                 widget.onDelete();
               },
               icon: Icon(Icons.delete, size: 25),
-            ),
+            )
           )
         ]),
       ),

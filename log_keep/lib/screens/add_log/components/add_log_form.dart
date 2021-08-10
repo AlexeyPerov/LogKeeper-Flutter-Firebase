@@ -209,7 +209,7 @@ class _AddLogFormState extends State<AddLogForm> {
   void _copyLink(BuildContext context, String id) {
     FlutterClipboard.copy(serverUrlFormat() + id).then((result) {
       final snackBar =
-          SnackBar(content: Text('Link to the new log copied to Clipboard'));
+          SnackBar(content: Text('Link to the new log copied to clipboard'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     });
   }

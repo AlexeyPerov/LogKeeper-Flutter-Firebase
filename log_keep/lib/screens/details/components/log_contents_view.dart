@@ -122,7 +122,7 @@ class _LogContentsViewState extends State<LogContentsView> {
                     onPressed: () =>
                         FlutterClipboard.copy(line.contents).then((result) {
                           final snackBar = SnackBar(
-                              content: Text('Log copied to Clipboard'));
+                              content: Text('Log copied to clipboard'));
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         }))
               ]),
