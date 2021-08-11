@@ -28,6 +28,8 @@ class AppThemeData {
       canvasColor: colorScheme.background,
       scaffoldBackgroundColor: colorScheme.background,
       highlightColor: Colors.transparent,
+      splashColor: Colors.transparent,
+      hoverColor: Colors.transparent,
       accentColor: colorScheme.primary,
       focusColor: focusColor,
       snackBarTheme: SnackBarThemeData(
