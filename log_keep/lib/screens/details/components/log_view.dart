@@ -5,6 +5,7 @@ import 'package:log_keep/app/theme/theme_constants.dart';
 import 'package:log_keep/app/theme/themes.dart';
 import 'package:log_keep/common/utilities/navigator_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
+import 'package:log_keep/repositories/settings_repository.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
 import 'log_contents_view.dart';
 
@@ -12,18 +13,28 @@ class LogView extends StatefulWidget {
   final LogAnalysisEntity log;
   final TextEditingController linkController;
   final Function onDelete;
+  final SettingsRepository settings;
 
-  LogView({Key key, @required this.log, @required this.onDelete})
+  LogView(
+      {Key key,
+      @required this.log,
+      @required this.onDelete,
+      @required this.settings})
       : this.linkController = new TextEditingController(
             text: serverUrlFormat() + log.originalLog.info.id),
         super(key: key);
 
   @override
-  _LogViewState createState() => _LogViewState();
+  _LogViewState createState() =>
+      _LogViewState(settings.getInt("selected_log_mode"));
 }
 
 class _LogViewState extends State<LogView> {
-  int _mode = 0;
+  int _mode;
+
+  _LogViewState(int defaultMode) {
+    _mode = defaultMode;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,29 +59,28 @@ class _LogViewState extends State<LogView> {
               child: IconButton(
                 padding: EdgeInsets.zero,
                 onPressed: () {
-                  FlutterClipboard.copy(widget.linkController.text).then((result) {
-                    final snackBar = SnackBar(
-                        content: Text('Link copied to clipboard'));
+                  FlutterClipboard.copy(widget.linkController.text)
+                      .then((result) {
+                    final snackBar =
+                        SnackBar(content: Text('Link copied to clipboard'));
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   });
                 },
                 icon: Icon(Icons.copy, size: 25),
-              )
-          ),
+              )),
           Padding(
-            padding: const EdgeInsets.only(right: 15.0),
-            child: IconButton(
-              padding: EdgeInsets.zero,
-              onPressed: () {
-                if (_mode == 0)
-                  setState(() {
-                    _mode = 1;
-                  });
-                widget.onDelete();
-              },
-              icon: Icon(Icons.delete, size: 25),
-            )
-          )
+              padding: const EdgeInsets.only(right: 15.0),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  if (_mode == 0)
+                    setState(() {
+                      _mode = 1;
+                    });
+                  widget.onDelete();
+                },
+                icon: Icon(Icons.delete, size: 25),
+              ))
         ]),
       ),
       SizedBox(height: 20),
@@ -138,6 +148,7 @@ class _LogViewState extends State<LogView> {
       onTap: () {
         setState(() {
           _mode = index;
+          widget.settings.putInt("selected_log_mode", index);
         });
       },
       child: Container(

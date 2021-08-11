@@ -7,6 +7,7 @@ import 'package:log_keep/app/app.dart';
 import 'package:log_keep/bloc/log_contents/log_contents.dart';
 import 'package:log_keep/common/utilities/navigator_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
+import 'package:log_keep/repositories/settings_repository.dart';
 import 'package:log_keep/screens/details/services/log_deletion_service.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
 import 'components/details_drawer.dart';
@@ -48,7 +49,8 @@ class DetailsScreen extends StatelessWidget {
                 log: log,
                 onDelete: () {
                   deleteLog(context, log);
-                })),
+                },
+                settings: getIt<SettingsRepository>())),
       );
     } else {
       var height = MediaQuery.of(context).size.height;
@@ -61,7 +63,8 @@ class DetailsScreen extends StatelessWidget {
                 log: log,
                 onDelete: () {
                   deleteLog(context, log);
-                }));
+                },
+                settings: getIt<SettingsRepository>()));
       }));
     }
   }
