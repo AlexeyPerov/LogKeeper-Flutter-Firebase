@@ -12,6 +12,7 @@ import 'package:log_keep/common/utilities/web_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/screens/details/details_screen.dart';
 import 'package:log_keep/screens/details/services/log_deletion_service.dart';
+import 'package:log_keep/screens/details/services/project_archiving_service.dart';
 import 'package:log_keep_shared/log_keep_shared.dart';
 import 'package:log_keep/common/utilities/string_extensions.dart';
 import 'package:proviso/proviso.dart';
@@ -107,23 +108,42 @@ class _LogsListState extends State<LogsList> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.all(20.0),
+              padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20),
               child: Text(projectInfo.project,
                   overflow: TextOverflow.fade, maxLines: 2),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 20.0, bottom: 20.0),
-              child: StreamBuilder(
-                stream: projectInfo.logsCount,
-                builder: (context, AsyncSnapshot<int> snapshot) {
-                  String count = '';
+              padding: const EdgeInsets.only(bottom: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 20.0),
+                    child: StreamBuilder(
+                      stream: projectInfo.logsCount,
+                      builder: (context, AsyncSnapshot<int> snapshot) {
+                        String count = '';
 
-                  if (snapshot.hasData) {
-                    count = snapshot.data.toString();
-                  }
+                        if (snapshot.hasData) {
+                          count = snapshot.data.toString();
+                        }
 
-                  return Text(count);
-                },
+                        return Text(count);
+                      },
+                    ),
+                  ),
+                  Spacer(),
+                  Padding(
+                    padding: EdgeInsets.only(right: 20.0),
+                    child: IconButton(
+                        icon: Icon(Icons.archive, size: 25),
+                        onPressed: () {
+                          ProjectArchivingService.requestArchiving(
+                              context, projectInfo.project);
+                        }),
+                  ),
+                ],
               ),
             ),
           ],
