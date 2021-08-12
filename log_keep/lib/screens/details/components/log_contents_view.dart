@@ -69,7 +69,9 @@ class _LogContentsViewState extends State<LogContentsView> {
         var contents =
             unfolded ? line.contents : (line.contents.substring(0, 25) + "...");
 
-        var backColor = index % 2 != 0 ? Colors.white : Color(0xFFE6EBEB);
+        var backColor = index % 2 != 0
+            ? Theme.of(context).colorScheme.secondary
+            : Theme.of(context).colorScheme.secondaryVariant;
 
         return Padding(
           padding: const EdgeInsets.only(top: 5),

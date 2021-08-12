@@ -13,9 +13,11 @@ import 'app/app.dart';
 import 'app/options/app_options.dart';
 import 'app/theme/theme_constants.dart';
 
-void main() {
+void main() async {
   getIt.registerSingleton<EventsStream>(CommonEventsStream());
   getIt.registerSingleton<SettingsRepository>(HiveSettingsRepository());
+
+  await getIt.get<SettingsRepository>().initialize();
 
   runApp(AppWidget());
 }
@@ -27,19 +29,21 @@ class AppWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ModelBinding(
-    initialModel: AppOptions(
-      themeMode: ThemeMode.light,
-      textScaleFactor: systemTextScaleFactorOption,
-      timeDilation: timeDilation,
-      platform: defaultTargetPlatform,
-      isTestMode: false,
-    ),
-    child: Builder(
-      builder: (context) {
-        return _createApp(context);
-      },
-    ),
-  );
+        initialModel: AppOptions(
+          themeMode: ThemeMode.values[getIt
+              .get<SettingsRepository>()
+              .getInt("theme_mode", defaultValue: ThemeMode.system.index)],
+          textScaleFactor: systemTextScaleFactorOption,
+          timeDilation: timeDilation,
+          platform: defaultTargetPlatform,
+          isTestMode: false,
+        ),
+        child: Builder(
+          builder: (context) {
+            return _createApp(context);
+          },
+        ),
+      );
 
   MaterialApp _createApp(BuildContext context) {
     return MaterialApp(

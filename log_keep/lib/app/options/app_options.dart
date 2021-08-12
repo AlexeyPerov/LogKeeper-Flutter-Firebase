@@ -119,8 +119,6 @@ class ApplyTextOptions extends StatelessWidget {
   }
 }
 
-// https://medium.com/flutter/managing-flutter-application-state-with-inheritedwidgets-1140452befe1
-
 class _ModelBindingScope extends InheritedWidget {
   _ModelBindingScope({
     Key key,

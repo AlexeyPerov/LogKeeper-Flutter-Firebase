@@ -24,8 +24,6 @@ class App {
       Bloc.observer = LoggableBlocObserver();
     }
 
-    await getIt.get<SettingsRepository>().initialize();
-
     firebaseApp = await Firebase.initializeApp();
 
     getIt.registerSingleton<LogsRepository>(

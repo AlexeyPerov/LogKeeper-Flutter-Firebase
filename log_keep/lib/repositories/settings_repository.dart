@@ -4,6 +4,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 abstract class SettingsRepository {
   Future initialize();
+
+  dynamic get(String key, dynamic defaultValue);
+  void put(String key, dynamic value);
+
   String getString(String key, {String defaultValue = ''});
   void putString(String key, String value);
 
@@ -21,6 +25,16 @@ class HiveSettingsRepository extends SettingsRepository {
       Hive.init(directory.path);
     }
     await Hive.openBox(_boxName);
+  }
+
+  @override
+  dynamic get(String key, dynamic defaultValue) {
+    return Hive.box(_boxName).get(key, defaultValue: defaultValue);
+  }
+
+  @override
+  void put(String key, dynamic value) {
+    Hive.box(_boxName).put(key, value);
   }
 
   @override
