@@ -4,6 +4,7 @@ import 'package:log_keep/app/configs.dart';
 import 'package:log_keep/app/theme/theme_constants.dart';
 import 'package:log_keep/app/theme/themes.dart';
 import 'package:log_keep/common/utilities/navigator_utilities.dart';
+import 'package:log_keep/common/utilities/web_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/repositories/settings_repository.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
@@ -133,9 +134,16 @@ class _LogViewState extends State<LogView> {
   Widget _buildModesList() {
     return Row(
       children: [
+        Spacer(),
         _modeCard(Icons.web, "Raw", 0, 0),
         _modeCard(Icons.view_headline, "Logs", 1, widget.log.lines.length),
-        _modeCard(Icons.error_outline, "Alarms", 2, widget.log.alarmsCount)
+        _modeCard(Icons.error_outline, "Alarms", 2, widget.log.alarmsCount),
+        _card(Icons.open_in_new_rounded, "New tab", () {
+          WebUtilities.openStringContentInNewPage(
+              widget.log.originalLog.data.contents);
+        }),
+        SizedBox(width: 25),
+        Spacer()
       ],
     );
   }
@@ -179,6 +187,42 @@ class _LogViewState extends State<LogView> {
                 ),
                 Padding(
                     padding: EdgeInsets.only(right: 15.0, bottom: 10.0),
+                    child: Icon(icon, size: 20))
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _card(
+      IconData icon, String title, Function onTap) {
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+        height: 80.0,
+        width: 100.0,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.secondaryVariant,
+          borderRadius: BorderRadius.circular(20.0),
+          boxShadow: [slightBoxShadow()],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(15.0),
+              child: Text(title, overflow: TextOverflow.fade, maxLines: 2),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                    padding: EdgeInsets.only(left: 15.0, bottom: 10.0),
                     child: Icon(icon, size: 20))
               ],
             ),

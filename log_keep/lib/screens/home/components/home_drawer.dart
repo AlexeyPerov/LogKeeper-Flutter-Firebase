@@ -18,7 +18,7 @@ class HomeDrawer extends StatelessWidget {
             SizedBox(height: 5),
             DrawerCard(
                 text: 'UPLOAD LOG',
-                color: Colors.orange[100],
+                color: Theme.of(context).cardColor,
                 onTap: () {
                   Navigator.push(
                       context,
@@ -28,7 +28,7 @@ class HomeDrawer extends StatelessWidget {
                 }),
             DrawerCard(
                 text: 'REMOTE ADMIN PANEL',
-                color: Color(0xFFF5F7FB),
+                color: Theme.of(context).cardColor,
                 onTap: () async {
                   var url = databaseAdminUrl();
                   if (await canLaunch(url)) {
@@ -40,7 +40,7 @@ class HomeDrawer extends StatelessWidget {
                 }),
             DrawerCard(
                 text: 'SETTINGS',
-                color: Color(0xFFF5F7FB),
+                color: Theme.of(context).cardColor,
                 onTap: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (c) => SettingsScreen()));
