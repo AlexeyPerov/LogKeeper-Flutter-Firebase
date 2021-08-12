@@ -46,7 +46,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
 
   Stream<ProjectsState> _mapProjectsUpdateToState(
       ProjectsUpdated event) async* {
-    var selectedProject = settingsRepository.get('selected_project');
+    var selectedProject = settingsRepository.getString('selected_project');
 
     if (selectedProject.isEmpty ||
         !event.projects
@@ -62,7 +62,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
   }
 
   Stream<ProjectsState> _mapSelectProjectToState(SelectProject event) async* {
-    settingsRepository.put('selected_project', event.newSelectedProject);
+    settingsRepository.putString('selected_project', event.newSelectedProject);
     yield ProjectsLoaded(state.projects, event.newSelectedProject);
 
     eventsStream.add(ProjectSelected(event.newSelectedProject));

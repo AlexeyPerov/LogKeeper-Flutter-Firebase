@@ -1,9 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:hovering/hovering.dart';
 import 'package:log_keep/app/theme/themes.dart';
-
-import 'hover_container.dart';
 
 class DrawerCard extends StatelessWidget {
   final String text;
@@ -38,7 +37,6 @@ class DrawerCard extends StatelessWidget {
           child: Text(
             text,
             style: TextStyle(
-              color: Colors.black,
               fontSize: 18.0,
               fontWeight: FontWeight.w600,
             ),

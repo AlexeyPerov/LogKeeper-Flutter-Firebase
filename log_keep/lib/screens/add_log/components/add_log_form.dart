@@ -1,4 +1,4 @@
-import 'package:clipboard_manager/clipboard_manager.dart';
+import 'package:clipboard/clipboard.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -49,19 +49,12 @@ class _AddLogFormState extends State<AddLogForm> {
           child: Row(
             children: [
               SizedBox(
-                height: 40,
-                width: 40,
-                child: FlatButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(60),
-                  ),
-                  color: Colors.white,
-                  padding: EdgeInsets.zero,
-                  onPressed: () => NavigatorUtilities.pushAndRemoveUntil(
-                      context, (c) => HomeScreen()),
-                  child: Icon(Icons.arrow_back_ios, size: 25),
-                ),
-              )
+                  height: 40,
+                  width: 40,
+                  child: IconButton(
+                      icon: Icon(Icons.arrow_back_ios, size: 25),
+                      onPressed: () => NavigatorUtilities.pushAndRemoveUntil(
+                          context, (c) => HomeScreen())))
             ],
           ),
         ),
@@ -210,14 +203,13 @@ class _AddLogFormState extends State<AddLogForm> {
 
   void _additionCompleted(BuildContext context) {
     UIBlock.unblock(context);
-    NavigatorUtilities.pushAndRemoveUntil(
-        context, (c) => HomeScreen());
+    NavigatorUtilities.pushAndRemoveUntil(context, (c) => HomeScreen());
   }
 
   void _copyLink(BuildContext context, String id) {
-    ClipboardManager.copyToClipBoard(serverUrlFormat() + id).then((result) {
+    FlutterClipboard.copy(serverUrlFormat() + id).then((result) {
       final snackBar =
-          SnackBar(content: Text('Link to the new log copied to Clipboard'));
+          SnackBar(content: Text('Link to the new log copied to clipboard'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     });
   }

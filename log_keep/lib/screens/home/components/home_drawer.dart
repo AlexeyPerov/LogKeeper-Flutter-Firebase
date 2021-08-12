@@ -5,6 +5,7 @@ import 'package:log_keep/common/widgets/drawer_card.dart';
 import 'package:log_keep/screens/add_log/add_log_screen.dart';
 import 'package:log_keep/screens/add_log/components/add_log_form.dart';
 import 'package:log_keep/screens/error/error_screen.dart';
+import 'package:log_keep/screens/settings/settings_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomeDrawer extends StatelessWidget {
@@ -17,7 +18,7 @@ class HomeDrawer extends StatelessWidget {
             SizedBox(height: 5),
             DrawerCard(
                 text: 'UPLOAD LOG',
-                color: Colors.orange[100],
+                color: Theme.of(context).cardColor,
                 onTap: () {
                   Navigator.push(
                       context,
@@ -26,21 +27,25 @@ class HomeDrawer extends StatelessWidget {
                               logForm: new AddLogFormParameters())));
                 }),
             DrawerCard(
-                text: 'ADMIN PANEL',
-                color: Color(0xFFF5F7FB),
+                text: 'REMOTE ADMIN PANEL',
+                color: Theme.of(context).cardColor,
                 onTap: () async {
                   var url = databaseAdminUrl();
                   if (await canLaunch(url)) {
                     await launch(url);
                   } else {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (c) => ErrorScreen()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (c) => ErrorScreen()));
                   }
+                }),
+            DrawerCard(
+                text: 'SETTINGS',
+                color: Theme.of(context).cardColor,
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (c) => SettingsScreen()));
                 })
           ]),
     );
   }
 }
-

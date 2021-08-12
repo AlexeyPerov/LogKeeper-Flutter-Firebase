@@ -14,6 +14,7 @@ abstract class LogsRepository {
   Future<LogEntity> getLogById(String id);
   Stream<List<String>> getProjects();
   Stream<int> getLogsCountByProject(String project);
+  Future<void> archiveProject(String project);
 }
 
 class FirestoreLogsRepository extends LogsRepository {
@@ -37,8 +38,21 @@ class FirestoreLogsRepository extends LogsRepository {
       }
       return snapshot.docs.map((doc) {
         return doc['name'].toString();
-      }).toList();
+      }).toSet().toList(growable: false);
     });
+  }
+
+  @override
+  Future<void> archiveProject(String project) async {
+    var projectQuery = await _projects.where('name', isEqualTo: project).get();
+
+    if (projectQuery.size == 0) {
+      return Future.value();
+    }
+
+    for (var doc in projectQuery.docs) {
+      await _projects.doc(doc.id).delete();
+    }
   }
 
   Stream<int> getLogsCountByProject(String project) {
@@ -208,4 +222,19 @@ ProjectInfo get defaultProjectInfo {
 
 Stream<int> defaultStream() async* {
   yield 0;
+}
+
+class LogAnalysisEntity {
+  final LogEntity originalLog;
+  final List<LogLine> lines;
+  final int alarmsCount;
+
+  LogAnalysisEntity(this.originalLog, this.lines, this.alarmsCount);
+}
+
+class LogLine {
+  final String contents;
+  final bool alarm;
+
+  LogLine(this.contents, this.alarm);
 }

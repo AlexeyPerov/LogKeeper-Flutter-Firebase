@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:fading_edge_scrollview/fading_edge_scrollview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +12,7 @@ import 'package:log_keep/common/utilities/web_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/screens/details/details_screen.dart';
 import 'package:log_keep/screens/details/services/log_deletion_service.dart';
+import 'package:log_keep/screens/details/services/project_archiving_service.dart';
 import 'package:log_keep_shared/log_keep_shared.dart';
 import 'package:log_keep/common/utilities/string_extensions.dart';
 import 'package:proviso/proviso.dart';
@@ -28,27 +29,33 @@ class LogsList extends StatefulWidget {
 }
 
 class _LogsListState extends State<LogsList> {
+  final _controller = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     var totalHeight = MediaQuery.of(context).size.height;
-    var projectsListHeight = 200.0;
+    var projectsListHeight = 160.0;
 
     return ListView(
       children: <Widget>[
         SizedBox(height: 20.0),
         Container(
           height: projectsListHeight,
-          child: ListView.builder(
+          child: FadingEdgeScrollView.fromScrollView(
+              child: ListView.builder(
+            controller: _controller,
             scrollDirection: Axis.horizontal,
             itemCount: widget.projects.length + 1,
             itemBuilder: (BuildContext context, int index) {
               if (index == 0) {
                 return SizedBox(width: 20.0);
               }
-              return _projectCard(index - 1, projectsListHeight, widget.projects[index - 1]);
+              return _projectCard(
+                  index - 1, projectsListHeight, widget.projects[index - 1]);
             },
-          ),
+          )),
         ),
+        Divider(),
         Container(
           height: totalHeight - projectsListHeight - 20,
           child: BlocBuilder<LogInfosBloc, LogInfosState>(
@@ -68,7 +75,7 @@ class _LogsListState extends State<LogsList> {
 
                   var log = list[index];
                   return Container(
-                      padding: EdgeInsets.only(top: 20),
+                      padding: EdgeInsets.only(bottom: 20),
                       child: _logCard(context, log));
                 },
               );
@@ -81,17 +88,6 @@ class _LogsListState extends State<LogsList> {
 
   Widget _projectCard(int index, double height, ProjectInfo projectInfo) {
     var selected = widget.selectedProject == projectInfo.project;
-    var projectNameStyle = TextStyle(
-      color: selected ? Colors.white : Color(0xFFAFB4C6),
-      fontSize: 28.0,
-      fontWeight: FontWeight.bold,
-    );
-
-    var logsCountStyle = TextStyle(
-      color: selected ? Colors.white : Colors.black,
-      fontSize: 25.0,
-      fontWeight: FontWeight.bold,
-    );
 
     return GestureDetector(
       onTap: () {
@@ -103,7 +99,7 @@ class _LogsListState extends State<LogsList> {
         height: height,
         width: 175.0,
         decoration: BoxDecoration(
-          color: selected ? kPrimaryColor : Color(0xFFF5F7FB),
+          color: selected ? kPrimaryColor : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [selected ? commonBoxShadow() : slightBoxShadow()],
         ),
@@ -112,30 +108,42 @@ class _LogsListState extends State<LogsList> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Text(
-                projectInfo.project,
-                overflow: TextOverflow.fade,
-                maxLines: 2,
-                style: projectNameStyle,
-              ),
+              padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20),
+              child: Text(projectInfo.project,
+                  overflow: TextOverflow.fade, maxLines: 2),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 20.0, bottom: 20.0),
-              child: StreamBuilder(
-                stream: projectInfo.logsCount,
-                builder: (context, AsyncSnapshot<int> snapshot) {
-                  String count = '';
+              padding: const EdgeInsets.only(bottom: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 20.0),
+                    child: StreamBuilder(
+                      stream: projectInfo.logsCount,
+                      builder: (context, AsyncSnapshot<int> snapshot) {
+                        String count = '';
 
-                  if (snapshot.hasData) {
-                    count = snapshot.data.toString();
-                  }
+                        if (snapshot.hasData) {
+                          count = snapshot.data.toString();
+                        }
 
-                  return Text(
-                    count,
-                    style: logsCountStyle,
-                  );
-                },
+                        return Text(count);
+                      },
+                    ),
+                  ),
+                  Spacer(),
+                  Padding(
+                    padding: EdgeInsets.only(right: 20.0),
+                    child: IconButton(
+                        icon: Icon(Icons.archive, size: 25),
+                        onPressed: () {
+                          ProjectArchivingService.requestArchiving(
+                              context, projectInfo.project);
+                        }),
+                  ),
+                ],
               ),
             ),
           ],
@@ -146,28 +154,12 @@ class _LogsListState extends State<LogsList> {
 
   Widget _logCard(BuildContext context, LogInfoEntity logInfo) {
     var title = logInfo.title.splitWordsByLength(kIsWeb ? 64 : 32);
-    var titleMainStyle = const TextStyle(
-      color: Colors.black,
-      fontSize: 18.0,
-      decoration: TextDecoration.underline,
-      fontWeight: FontWeight.w600,
-    );
-    var titleSecondaryStyle = const TextStyle(
-      color: Colors.black,
-      fontSize: 14.0,
-      fontWeight: FontWeight.w300,
-    );
-    var dateStyle = const TextStyle(
-      color: Color(0xFFAFB4C6),
-      fontSize: 18.0,
-      fontWeight: FontWeight.w500,
-    );
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 30.0),
       padding: EdgeInsets.all(30.0),
       decoration: BoxDecoration(
-          color: Color(0xFFF5F7FB),
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(30.0),
           boxShadow: [minorBoxShadow()]),
       child: GestureDetector(
@@ -180,45 +172,27 @@ class _LogsListState extends State<LogsList> {
           children: <Widget>[
             Align(
               alignment: Alignment.topLeft,
-              child: Text(
-                title.item1,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: titleMainStyle,
-              ),
+              child: Text(title.item1,
+                  overflow: TextOverflow.ellipsis, maxLines: 1),
             ),
             SizedBox(height: 10.0),
             Align(
               alignment: Alignment.topLeft,
-              child: Text(
-                title.item2,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: titleSecondaryStyle,
-              ),
+              child: Text(title.item2,
+                  overflow: TextOverflow.ellipsis, maxLines: 1),
             ),
-            SizedBox(height: 10.0),
+            SizedBox(height: 5.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Text(
-                  dateFormatter.format(logInfo.createdAt),
-                  style: dateStyle,
-                ),
+                Text(dateFormatter.format(logInfo.createdAt)),
                 SizedBox(width: 10.0),
-                Text(
-                  timeFormatter.format(logInfo.createdAt),
-                  style: dateStyle,
-                ),
+                Text(timeFormatter.format(logInfo.createdAt)),
                 SizedBox(width: 10.0),
                 ConditionWidget(
                   condition: kIsWeb,
-                  widget: Text(
-                    logInfo.author,
-                    maxLines: 1,
-                    style: dateStyle,
-                  ),
+                  widget: Text(logInfo.author, maxLines: 1),
                 ),
                 Spacer(),
                 ConditionWidget(
@@ -258,17 +232,9 @@ class LogCardMiniButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 10, top: 10),
       child: SizedBox(
-        height: 30,
-        width: 30,
-        child: FlatButton(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(60),
-          ),
-          padding: EdgeInsets.zero,
-          onPressed: pressed,
-          child: Icon(icon, size: 25),
-        ),
-      ),
+          height: 30,
+          width: 30,
+          child: IconButton(icon: Icon(icon, size: 25), onPressed: pressed)),
     );
   }
 }

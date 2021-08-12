@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:log_keep_shared/log_keep_shared.dart';
+import 'package:log_keep/repositories/logs_repository.dart';
 
 abstract class LogContentsEvent extends Equatable {
   const LogContentsEvent();
@@ -15,7 +15,7 @@ class LoadLogContents extends LogContentsEvent {
 }
 
 class LogContentsUpdated extends LogContentsEvent {
-  final LogEntity log;
+  final LogAnalysisEntity log;
 
   const LogContentsUpdated(this.log);
 

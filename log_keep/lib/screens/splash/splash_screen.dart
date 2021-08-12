@@ -6,10 +6,13 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: kIsWeb ? AppBar(
-          leading: Container(),
-        ) : Container(),
+        appBar: kIsWeb
+            ? AppBar(
+                leading: Container(),
+              )
+            : Container(),
         body: Align(
-            alignment: Alignment.center, child: LinearProgressIndicator()));
+            alignment: Alignment.center,
+            child: LinearProgressIndicator()));
   }
 }

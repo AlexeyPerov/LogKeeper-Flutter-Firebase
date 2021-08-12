@@ -4,21 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:log_keep/app/app.dart';
 import 'package:log_keep/common/dialogs/confirm_dialog.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
-import 'package:log_keep_shared/log_keep_shared.dart';
 import 'package:uiblock/uiblock.dart';
 
-class LogDeletionService {
-  static Future<bool> requestDeletion(
-      BuildContext context, String project, LogInfoEntity logInfo) {
+class ProjectArchivingService {
+  static Future<bool> requestArchiving(BuildContext context, String project) {
     var result = new Completer<bool>();
 
     var params = ConfirmDialogParams(
-        "Log Deletion",
-        "Are you sure you want to delete this log?",
+        "Project Archiving",
+        "Are you sure you want to archive this project? "
+            "If you later add a new log to it,"
+            " the whole project will be restored.",
         "Cancel",
-        "Delete",
+        "Archive",
         () => {
-              performDeletion(context, project, logInfo)
+              performArchiving(context, project)
                   .whenComplete(() => result.complete(true))
             },
         () => {result.complete(false)});
@@ -28,15 +28,11 @@ class LogDeletionService {
     return result.future;
   }
 
-  static Future performDeletion(
-      BuildContext context, String project, LogInfoEntity logInfo) {
-    UIBlock.block(context,
-        loadingTextWidget: Text('Deleting..,'));
+  static Future performArchiving(BuildContext context, String project) {
+    UIBlock.block(context, loadingTextWidget: Text('Archiving..,'));
 
-    var future = getIt<LogsRepository>().removeLog(project, logInfo.id);
-
+    var future = getIt<LogsRepository>().archiveProject(project);
     future.whenComplete(() => UIBlock.unblock(context));
-
     return future;
   }
 }
