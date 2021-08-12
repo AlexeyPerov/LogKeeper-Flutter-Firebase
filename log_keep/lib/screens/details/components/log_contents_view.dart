@@ -70,14 +70,18 @@ class _LogContentsViewState extends State<LogContentsView> {
             unfolded ? line.contents : (line.contents.substring(0, 25) + "...");
 
         var backColor = index % 2 != 0
-            ? Theme.of(context).colorScheme.secondary
-            : Theme.of(context).colorScheme.secondaryVariant;
+            ? Theme.of(context).colorScheme.background
+            : Theme.of(context).colorScheme.onBackground;
 
         return Padding(
           padding: const EdgeInsets.only(top: 5),
           child: Container(
             decoration: BoxDecoration(
-                color: backColor, borderRadius: BorderRadius.circular(20.0)),
+                color: backColor,
+                borderRadius: BorderRadius.circular(20.0),
+                border: Border.all(
+                    color: alarm ? Colors.orangeAccent : Color(0xFF000000),
+                    width: alarm ? 2 : 0)),
             child: Padding(
               padding: const EdgeInsets.only(top: 10, left: 10),
               child:

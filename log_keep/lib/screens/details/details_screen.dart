@@ -32,7 +32,8 @@ class DetailsScreen extends StatelessWidget {
             body: getWidgetForLoadedState(context, state.log));
       } else {
         return Align(
-            alignment: Alignment.center, child: LinearProgressIndicator());
+            alignment: Alignment.center,
+            child: LinearProgressIndicator());
       }
     }));
   }

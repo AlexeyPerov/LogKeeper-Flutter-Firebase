@@ -5,6 +5,7 @@ import 'package:log_keep/app/configs.dart';
 import 'package:log_keep/common/utilities/web_utilities.dart';
 import 'package:log_keep/common/widgets/drawer_card.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
+import 'package:log_keep/screens/settings/settings_screen.dart';
 import 'package:log_keep_shared/log_keep_shared.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -43,7 +44,18 @@ class DetailsDrawer extends StatelessWidget {
                         SnackBar(content: Text('Error opening db page'));
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
-                })
+                }),
+            SizedBox(height: 30),
+            Icon(Icons.settings, size: 80),
+            SizedBox(height: 30),
+            Column(
+              children: [
+                drawThemeModeCard(context, Icons.sync, ThemeMode.system),
+                drawThemeModeCard(
+                    context, Icons.lightbulb_outline, ThemeMode.light),
+                drawThemeModeCard(context, Icons.lightbulb, ThemeMode.dark),
+              ],
+            ),
           ]),
     );
   }

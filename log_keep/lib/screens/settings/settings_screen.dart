@@ -21,9 +21,9 @@ class SettingsScreen extends StatelessWidget {
           Row(
             children: [
               Spacer(),
-              _modeCard(context, Icons.sync, ThemeMode.system),
-              _modeCard(context, Icons.lightbulb_outline, ThemeMode.light),
-              _modeCard(context, Icons.lightbulb, ThemeMode.dark),
+              drawThemeModeCard(context, Icons.sync, ThemeMode.system),
+              drawThemeModeCard(context, Icons.lightbulb_outline, ThemeMode.light),
+              drawThemeModeCard(context, Icons.lightbulb, ThemeMode.dark),
               Spacer()
             ],
           ),
@@ -44,45 +44,45 @@ class SettingsScreen extends StatelessWidget {
       ),
     ));
   }
+}
 
-  Widget _modeCard(BuildContext context, IconData icon, ThemeMode themeMode) {
-    var selected = AppOptions.of(context).themeMode == themeMode;
+Widget drawThemeModeCard(BuildContext context, IconData icon, ThemeMode themeMode) {
+  var selected = AppOptions.of(context).themeMode == themeMode;
 
-    return GestureDetector(
-      onTap: () {
-        AppOptions.update(
-            context, AppOptions.of(context).copyWith(themeMode: themeMode));
-        getIt.get<SettingsRepository>().putInt("theme_mode", themeMode.index);
-      },
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-        height: 120.0,
-        width: 160.0,
-        decoration: BoxDecoration(
-          color: selected ? kPrimaryColor : Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(20.0),
-          boxShadow: [selected ? commonBoxShadow() : slightBoxShadow()],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(left: 25.0, top: 30.0),
-              child: Text(
-                  themeMode
-                      .toString()
-                      .replaceAll("ThemeMode.", "")
-                      .toUpperCase(),
-                  overflow: TextOverflow.fade,
-                  maxLines: 2),
-            ),
-            Padding(
-                padding: EdgeInsets.only(left: 25.0, bottom: 30.0),
-                child: Icon(icon, size: 20))
-          ],
-        ),
+  return GestureDetector(
+    onTap: () {
+      AppOptions.update(
+          context, AppOptions.of(context).copyWith(themeMode: themeMode));
+      getIt.get<SettingsRepository>().putInt("theme_mode", themeMode.index);
+    },
+    child: Container(
+      margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+      height: 120.0,
+      width: 160.0,
+      decoration: BoxDecoration(
+        color: selected ? kPrimaryColor : Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(20.0),
+        boxShadow: [selected ? commonBoxShadow() : slightBoxShadow()],
       ),
-    );
-  }
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(left: 25.0, top: 30.0),
+            child: Text(
+                themeMode
+                    .toString()
+                    .replaceAll("ThemeMode.", "")
+                    .toUpperCase(),
+                overflow: TextOverflow.fade,
+                maxLines: 2),
+          ),
+          Padding(
+              padding: EdgeInsets.only(left: 25.0, bottom: 30.0),
+              child: Icon(icon, size: 20))
+        ],
+      ),
+    ),
+  );
 }
