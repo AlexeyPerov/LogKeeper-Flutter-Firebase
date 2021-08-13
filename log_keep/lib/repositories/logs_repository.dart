@@ -233,8 +233,9 @@ class LogAnalysisEntity {
 }
 
 class LogLine {
+  final int index;
   final String contents;
   final bool alarm;
 
-  LogLine(this.contents, this.alarm);
+  LogLine(this.index, this.contents, this.alarm);
 }

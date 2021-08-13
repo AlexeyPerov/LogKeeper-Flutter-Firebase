@@ -26,15 +26,18 @@ class LogContentsBloc extends Bloc<LogContentsEvent, LogContentsState> {
     var lines = List<LogLine>.empty(growable: true);
     var alarmsCount = 0;
 
-    for (var rawLine in linesRaw) {
+    for (int i = 0; i < linesRaw.length; i++) {
+      var rawLine = linesRaw[i];
       var isAlarm = false;
 
-      isAlarm = rawLine.contains("Exception") ||
-          rawLine.contains("Error") ||
-          rawLine.contains("Warning") ||
-          rawLine.contains("Fail");
+      var lowerCased = rawLine.toLowerCase();
 
-      lines.add(LogLine(rawLine, isAlarm));
+      isAlarm = lowerCased.contains("exception") ||
+          lowerCased.contains("error") ||
+          lowerCased.contains("warning") ||
+          lowerCased.contains("fail");
+
+      lines.add(LogLine(i, rawLine, isAlarm));
 
       if (isAlarm) {
         alarmsCount ++;

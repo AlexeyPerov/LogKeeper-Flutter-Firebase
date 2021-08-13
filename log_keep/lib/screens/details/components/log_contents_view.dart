@@ -24,14 +24,25 @@ class _LogContentsViewState extends State<LogContentsView> {
   var _lineParams = Map<int, _LineOptions>();
   var _errorLineParams = Map<int, _LineOptions>();
 
+  var _logTextStyle = const TextStyle(
+      height: 1.2, fontSize: 14.0, letterSpacing: 0.5, wordSpacing: 1);
+
+  var _logIndexTextStyle = const TextStyle(
+      height: 1.2,
+      fontSize: 14.0,
+      letterSpacing: 0.5,
+      wordSpacing: 1,
+      color: Colors.grey);
+
   @override
   Widget build(BuildContext context) {
     if (widget.mode == 1) {
-      return _buildLogListView(widget.log.lines, _lineParams, false);
+      return _buildLogListView(widget.log.lines, _lineParams, false, false);
     } else if (widget.mode == 2) {
       return _buildLogListView(
           widget.log.lines.where((x) => x.alarm).toList(growable: false),
           _errorLineParams,
+          true,
           true);
     } else {
       return _buildWebRawView();
@@ -39,10 +50,7 @@ class _LogContentsViewState extends State<LogContentsView> {
   }
 
   Widget _buildLogListView(List<LogLine> lines,
-      Map<int, _LineOptions> lineParams, bool selectableText) {
-    var textStyle = const TextStyle(
-        height: 1.2, fontSize: 14.0, letterSpacing: 0.5, wordSpacing: 1);
-
+      Map<int, _LineOptions> lineParams, bool selectableText, bool alarmsOnly) {
     return ListView.builder(
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
@@ -90,11 +98,20 @@ class _LogContentsViewState extends State<LogContentsView> {
                     condition: selectable,
                     widget: Expanded(
                         child: SelectableText(contents,
-                            style: textStyle,
+                            style: _logTextStyle,
                             toolbarOptions: commonToolbarOptions())),
                     fallback:
-                        Expanded(child: Text(contents, style: textStyle))),
-                ConditionWidget(condition: alarm, widget: Icon(Icons.whatshot)),
+                        Expanded(child: Text(contents, style: _logTextStyle))),
+                ConditionWidget(
+                    condition: !alarmsOnly && alarm,
+                    widget: Padding(
+                      padding: const EdgeInsets.only(right: 7),
+                      child: Icon(Icons.error_outline),
+                    )),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4, right: 3),
+                  child: Text(line.index.toString(), style: _logIndexTextStyle),
+                ),
                 ConditionWidget(
                     condition: canBeFolded,
                     widget: ConditionWidget(
