@@ -9,6 +9,7 @@ import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:proviso/proviso.dart';
 import 'package:web_browser/web_browser.dart';
 import 'package:universal_html/html.dart' as html;
+import 'package:log_keep/common/utilities/color_extensions.dart';
 
 class LogContentsView extends StatefulWidget {
   final LogAnalysisEntity log;
@@ -247,13 +248,24 @@ class _LogContentsViewState extends State<LogContentsView> {
   }
 
   Widget _buildWebView(List<LogLine> lines) {
+    final textColor = Theme.of(context).textTheme.bodyText1.color;
+    final textRgb =
+        'rgb(${textColor.red}, ${textColor.green}, ${textColor.blue})';
+    ;
+
+    final backColor = Theme.of(context).colorScheme.background;
+    final backRgb =
+        'rgb(${backColor.red}, ${backColor.green}, ${backColor.blue})';
+
     var lineContents = '';
 
     for (var line in lines) {
-      lineContents += '<pre>' + line.contents + '</pre>';
+      lineContents += '<pre style="color:$textRgb">' + line.contents + '</pre>';
     }
 
-    final contents = '<html><body>' + lineContents + '</body></html>';
+    final contents = '<html><body style="background-color:$backRgb">' +
+        lineContents +
+        '</body></html>';
     final blob = html.Blob([contents], 'text/html');
     final url = html.Url.createObjectUrlFromBlob(blob);
     var width = MediaQuery.of(context).size.width;

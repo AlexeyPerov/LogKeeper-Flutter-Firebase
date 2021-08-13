@@ -28,15 +28,17 @@ class LogView extends StatefulWidget {
 
   @override
   _LogViewState createState() =>
-      _LogViewState(settings.getInt("selected_log_mode"));
+      _LogViewState(settings.getInt("selected_log_mode"),
+          settings.getBool("selected_web_view_mode"));
 }
 
 class _LogViewState extends State<LogView> {
   int _mode;
-  bool _useWebView = true;
+  bool _useWebView;
 
-  _LogViewState(int defaultMode) {
+  _LogViewState(int defaultMode, bool defaultUseWebView) {
     _mode = defaultMode;
+    _useWebView = defaultUseWebView;
   }
 
   @override
@@ -78,7 +80,9 @@ class _LogViewState extends State<LogView> {
                 onPressed: () {
                   if (_mode == 0)
                     setState(() {
-                      _mode = 1;
+                      // we need this because webView block all raycasts on top of it
+                      _useWebView = false;
+                      widget.settings.putBool("selected_web_view_mode", false);
                     });
                   widget.onDelete();
                 },
@@ -127,7 +131,8 @@ class _LogViewState extends State<LogView> {
             left: 10,
             right: 20,
           ),
-          child: LogContentsView(log: widget.log, mode: _mode, webView: _useWebView),
+          child: LogContentsView(
+              log: widget.log, mode: _mode, webView: _useWebView),
         ),
       )
     ]);
@@ -166,19 +171,24 @@ class _LogViewState extends State<LogView> {
         Spacer(),
         IconButton(
             icon: Icon(Icons.request_page_outlined),
-            color: _useWebView ? Colors.white : Colors.grey,
+            color: _useWebView
+                ? Theme.of(context).colorScheme.primaryVariant
+                : Colors.grey,
             onPressed: () {
               setState(() {
                 _useWebView = true;
+                widget.settings.putBool("selected_web_view_mode", true);
               });
             }),
         IconButton(
             icon: Icon(Icons.view_list),
-            color:
-            !_useWebView ? Colors.white : Colors.grey,
+            color: !_useWebView
+                ? Theme.of(context).colorScheme.primaryVariant
+                : Colors.grey,
             onPressed: () {
               setState(() {
                 _useWebView = false;
+                widget.settings.putBool("selected_web_view_mode", false);
               });
             })
       ],
@@ -239,7 +249,7 @@ class _LogViewState extends State<LogView> {
         height: 80.0,
         width: 100.0,
         decoration: BoxDecoration(
-          color: Color(0xFF1B526F),
+          color: Theme.of(context).colorScheme.secondary,
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [slightBoxShadow()],
         ),
