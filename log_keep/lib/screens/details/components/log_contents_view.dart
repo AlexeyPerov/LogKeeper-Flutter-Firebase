@@ -190,7 +190,7 @@ class _LogContentsViewState extends State<LogContentsView> {
 
   Widget _buildWebRawView() {
     var rawContents = widget.log.originalLog.data.contents;
-    final contents = WebUtilities.createHtmlForLogContents(rawContents, true);
+    final contents = WebUtilities.createHtmlForLogContents(rawContents);
     final blob = html.Blob([contents], 'text/html');
     final url = html.Url.createObjectUrlFromBlob(blob);
     var width = MediaQuery.of(context).size.width;

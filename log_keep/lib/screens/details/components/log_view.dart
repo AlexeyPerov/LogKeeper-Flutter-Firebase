@@ -148,7 +148,7 @@ class _LogViewState extends State<LogView> {
         ConditionWidget(
             condition: widget.log.modelCount > 0,
             widget: _modeCard(
-                Icons.error_outline, "Model", 3, widget.log.modelCount)),
+                Icons.error_outline, "Server", 3, widget.log.modelCount)),
         ConditionWidget(
             condition: widget.log.cheatCount > 0,
             widget: _modeCard(
