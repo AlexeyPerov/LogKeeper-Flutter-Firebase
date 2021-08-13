@@ -8,6 +8,7 @@ import 'package:log_keep/common/utilities/web_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/repositories/settings_repository.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
+import 'package:proviso/proviso.dart';
 import 'log_contents_view.dart';
 
 class LogView extends StatefulWidget {
@@ -136,8 +137,26 @@ class _LogViewState extends State<LogView> {
       children: [
         Spacer(),
         _modeCard(Icons.web, "Raw", 0, 0),
-        _modeCard(Icons.view_headline, "Logs", 1, widget.log.lines.length),
-        _modeCard(Icons.error_outline, "Alarms", 2, widget.log.alarmsCount),
+        ConditionWidget(
+            condition: widget.log.lines.length > 0,
+            widget: _modeCard(
+                Icons.view_headline, "Logs", 1, widget.log.lines.length)),
+        ConditionWidget(
+            condition: widget.log.alarmsCount > 0,
+            widget: _modeCard(
+                Icons.error_outline, "Alarms", 2, widget.log.alarmsCount)),
+        ConditionWidget(
+            condition: widget.log.modelCount > 0,
+            widget: _modeCard(
+                Icons.error_outline, "Model", 3, widget.log.modelCount)),
+        ConditionWidget(
+            condition: widget.log.cheatCount > 0,
+            widget: _modeCard(
+                Icons.error_outline, "Cheat", 4, widget.log.cheatCount)),
+        ConditionWidget(
+            condition: widget.log.tutorialCount > 0,
+            widget: _modeCard(
+                Icons.error_outline, "Tutorial", 5, widget.log.tutorialCount)),
         _card(Icons.open_in_new_rounded, "New tab", () {
           WebUtilities.openStringContentInNewPage(
               widget.log.originalLog.data.contents);
@@ -196,9 +215,7 @@ class _LogViewState extends State<LogView> {
     );
   }
 
-  Widget _card(
-      IconData icon, String title, Function onTap) {
-
+  Widget _card(IconData icon, String title, Function onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -206,7 +223,7 @@ class _LogViewState extends State<LogView> {
         height: 80.0,
         width: 100.0,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondaryVariant,
+          color: Color(0xFF1B526F),
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [slightBoxShadow()],
         ),

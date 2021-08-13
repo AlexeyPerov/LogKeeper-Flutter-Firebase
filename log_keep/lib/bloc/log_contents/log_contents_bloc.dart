@@ -24,27 +24,50 @@ class LogContentsBloc extends Bloc<LogContentsEvent, LogContentsState> {
 
     var linesRaw = log.data.contents.split(RegExp(r"\|[0-9]+\|"));
     var lines = List<LogLine>.empty(growable: true);
-    var alarmsCount = 0;
+    var totalAlarmsCount = 0;
+    var totalCheatCount = 0;
+    var totalModelCount = 0;
+    var totalTutorialCount = 0;
+
+    final alarmExp = new RegExp(
+        'exception|warning|incorrect|timeout|unable|cannot|fail|can\'t',
+        caseSensitive: false);
+    final cheatExp = new RegExp('cheat', caseSensitive: false);
+    final tutorialExp = new RegExp('tutorial', caseSensitive: false);
+    final modelExp = new RegExp(
+        r'(\[ProfileService\])|(\[Server\])|(Request:)|(Response:)|(Received response)',
+        caseSensitive: false);
 
     for (int i = 0; i < linesRaw.length; i++) {
       var rawLine = linesRaw[i];
-      var isAlarm = false;
 
-      var lowerCased = rawLine.toLowerCase();
+      final cheatCount = cheatExp.allMatches(rawLine).length;
+      final tutorialCount = tutorialExp.allMatches(rawLine).length;
+      final modelCount = modelExp.allMatches(rawLine).length;
 
-      isAlarm = lowerCased.contains("exception") ||
-          lowerCased.contains("error") ||
-          lowerCased.contains("warning") ||
-          lowerCased.contains("fail");
+      var alarmsCount = alarmExp.allMatches(rawLine).length;
 
-      lines.add(LogLine(i, rawLine, isAlarm));
-
-      if (isAlarm) {
-        alarmsCount ++;
+      final errorMatches = rawLine.allMatches("error").length;
+      final fakeErrorMatches = rawLine.allMatches('error\":null').length;
+      if (errorMatches != fakeErrorMatches) {
+        alarmsCount = errorMatches - fakeErrorMatches;
       }
+
+      final isAlarm = alarmsCount > 0;
+      final isCheat = cheatCount > 0;
+      final isModel = modelCount > 0;
+      final isTutorial = tutorialCount > 0;
+
+      lines.add(LogLine(i, rawLine, isAlarm, isCheat, isModel, isTutorial));
+
+      totalAlarmsCount += alarmsCount;
+      totalCheatCount += cheatCount;
+      totalModelCount += modelCount;
+      totalTutorialCount += tutorialCount;
     }
 
-    add(LogContentsUpdated(LogAnalysisEntity(log, lines, alarmsCount)));
+    add(LogContentsUpdated(LogAnalysisEntity(log, lines, totalAlarmsCount,
+        totalCheatCount, totalModelCount, totalTutorialCount)));
   }
 
   Stream<LogContentsState> _mapLogContentsUpdateToState(
