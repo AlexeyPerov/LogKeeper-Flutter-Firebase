@@ -13,8 +13,13 @@ import 'package:universal_html/html.dart' as html;
 class LogContentsView extends StatefulWidget {
   final LogAnalysisEntity log;
   final int mode;
+  final bool webView;
 
-  LogContentsView({Key key, @required this.log, @required this.mode})
+  LogContentsView(
+      {Key key,
+      @required this.log,
+      @required this.mode,
+      @required this.webView})
       : super(key: key);
 
   @override
@@ -37,30 +42,64 @@ class _LogContentsViewState extends State<LogContentsView> {
   @override
   Widget build(BuildContext context) {
     if (widget.mode == 1) {
+      final lines = widget.log.lines;
+
+      if (widget.webView) {
+        return _buildWebView(lines);
+      }
+
       return _buildLogListView(
-          lines: widget.log.lines,
+          lines: lines,
           lineParams: _lineParams,
           selectableText: false,
           showAlarmIcons: true);
     } else if (widget.mode == 2) {
+      final lines =
+          widget.log.lines.where((x) => x.alarm).toList(growable: false);
+
+      if (widget.webView) {
+        return _buildWebView(lines);
+      }
+
       return _buildLogListView(
-          lines: widget.log.lines.where((x) => x.alarm).toList(growable: false),
+          lines: lines,
           lineParams: _lineParams,
           selectableText: true,
           showAlarmIcons: false);
     } else if (widget.mode == 3) {
+      final lines =
+          widget.log.lines.where((x) => x.model).toList(growable: false);
+
+      if (widget.webView) {
+        return _buildWebView(lines);
+      }
+
       return _buildLogListView(
-          lines: widget.log.lines.where((x) => x.model).toList(growable: false),
+          lines: lines,
           lineParams: _lineParams,
           selectableText: true,
           showAlarmIcons: true);
     } else if (widget.mode == 4) {
+      final lines =
+          widget.log.lines.where((x) => x.cheat).toList(growable: false);
+
+      if (widget.webView) {
+        return _buildWebView(lines);
+      }
+
       return _buildLogListView(
-          lines: widget.log.lines.where((x) => x.cheat).toList(growable: false),
+          lines: lines,
           lineParams: _lineParams,
           selectableText: true,
           showAlarmIcons: true);
     } else if (widget.mode == 5) {
+      final lines =
+          widget.log.lines.where((x) => x.tutorial).toList(growable: false);
+
+      if (widget.webView) {
+        return _buildWebView(lines);
+      }
+
       return _buildLogListView(
           lines:
               widget.log.lines.where((x) => x.tutorial).toList(growable: false),
@@ -95,7 +134,7 @@ class _LogContentsViewState extends State<LogContentsView> {
             ? lineParams[line.index].selectable
             : selectableText;
 
-        var defaultUnfoldedValue = !longLine || alarm || !canBeFolded;
+        var defaultUnfoldedValue = !longLine || !canBeFolded;
         var unfolded = lineParams[line.index] != null
             ? lineParams[line.index].unfolded
             : defaultUnfoldedValue;
@@ -191,6 +230,30 @@ class _LogContentsViewState extends State<LogContentsView> {
   Widget _buildWebRawView() {
     var rawContents = widget.log.originalLog.data.contents;
     final contents = WebUtilities.createHtmlForLogContents(rawContents);
+    final blob = html.Blob([contents], 'text/html');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    var width = MediaQuery.of(context).size.width;
+    var browserWidth = min(850, width);
+    return Container(
+      padding: EdgeInsets.all(1),
+      decoration: BoxDecoration(color: Colors.grey[300]),
+      child: WebBrowser(
+          initialUrl: url,
+          iframeSettings: WebBrowserIFrameSettings(
+              width: '"' + browserWidth.toString() + '"'),
+          interactionSettings:
+              WebBrowserInteractionSettings(topBar: null, bottomBar: null)),
+    );
+  }
+
+  Widget _buildWebView(List<LogLine> lines) {
+    var lineContents = '';
+
+    for (var line in lines) {
+      lineContents += '<pre>' + line.contents + '</pre>';
+    }
+
+    final contents = '<html><body>' + lineContents + '</body></html>';
     final blob = html.Blob([contents], 'text/html');
     final url = html.Url.createObjectUrlFromBlob(blob);
     var width = MediaQuery.of(context).size.width;

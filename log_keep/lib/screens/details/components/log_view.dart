@@ -33,6 +33,7 @@ class LogView extends StatefulWidget {
 
 class _LogViewState extends State<LogView> {
   int _mode;
+  bool _useWebView = true;
 
   _LogViewState(int defaultMode) {
     _mode = defaultMode;
@@ -126,7 +127,7 @@ class _LogViewState extends State<LogView> {
             left: 10,
             right: 20,
           ),
-          child: LogContentsView(log: widget.log, mode: _mode),
+          child: LogContentsView(log: widget.log, mode: _mode, webView: _useWebView),
         ),
       )
     ]);
@@ -136,39 +137,56 @@ class _LogViewState extends State<LogView> {
     return Row(
       children: [
         Spacer(),
-        _modeCard(Icons.web, "Raw", 0, 0),
+        _modeCard(Icons.web, "Raw", 0, 0, false),
         ConditionWidget(
             condition: widget.log.lines.length > 0,
             widget: _modeCard(
-                Icons.view_headline, "Logs", 1, widget.log.lines.length)),
+                Icons.view_headline, "Logs", 1, widget.log.lines.length, true)),
         ConditionWidget(
             condition: widget.log.alarmsCount > 0,
-            widget: _modeCard(
-                Icons.error_outline, "Alarms", 2, widget.log.alarmsCount)),
+            widget: _modeCard(Icons.error_outline, "Alarms", 2,
+                widget.log.alarmsCount, true)),
         ConditionWidget(
             condition: widget.log.modelCount > 0,
             widget: _modeCard(
-                Icons.error_outline, "Server", 3, widget.log.modelCount)),
+                Icons.error_outline, "Server", 3, widget.log.modelCount, true)),
         ConditionWidget(
             condition: widget.log.cheatCount > 0,
             widget: _modeCard(
-                Icons.error_outline, "Cheat", 4, widget.log.cheatCount)),
+                Icons.error_outline, "Cheat", 4, widget.log.cheatCount, true)),
         ConditionWidget(
             condition: widget.log.tutorialCount > 0,
-            widget: _modeCard(
-                Icons.error_outline, "Tutorial", 5, widget.log.tutorialCount)),
+            widget: _modeCard(Icons.error_outline, "Tutorial", 5,
+                widget.log.tutorialCount, true)),
         _card(Icons.open_in_new_rounded, "New tab", () {
           WebUtilities.openStringContentInNewPage(
               widget.log.originalLog.data.contents);
         }),
         SizedBox(width: 25),
-        Spacer()
+        Spacer(),
+        IconButton(
+            icon: Icon(Icons.request_page_outlined),
+            color: _useWebView ? Colors.white : Colors.grey,
+            onPressed: () {
+              setState(() {
+                _useWebView = true;
+              });
+            }),
+        IconButton(
+            icon: Icon(Icons.view_list),
+            color:
+            !_useWebView ? Colors.white : Colors.grey,
+            onPressed: () {
+              setState(() {
+                _useWebView = false;
+              });
+            })
       ],
     );
   }
 
-  Widget _modeCard(
-      IconData icon, String title, int index, int additionalCountInfo) {
+  Widget _modeCard(IconData icon, String title, int index,
+      int additionalCountInfo, bool canUseWebView) {
     var selected = _mode == index;
 
     return GestureDetector(
@@ -188,13 +206,14 @@ class _LogViewState extends State<LogView> {
           boxShadow: [selected ? commonBoxShadow() : slightBoxShadow()],
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.all(15.0),
-              child: Text(title, overflow: TextOverflow.fade, maxLines: 2),
+              padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0),
+              child: Text(title, overflow: TextOverflow.fade, maxLines: 1),
             ),
+            Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -203,12 +222,9 @@ class _LogViewState extends State<LogView> {
                   child: Text(additionalCountInfo != 0
                       ? additionalCountInfo.toString()
                       : ""),
-                ),
-                Padding(
-                    padding: EdgeInsets.only(right: 15.0, bottom: 10.0),
-                    child: Icon(icon, size: 20))
+                )
               ],
-            ),
+            )
           ],
         ),
       ),
