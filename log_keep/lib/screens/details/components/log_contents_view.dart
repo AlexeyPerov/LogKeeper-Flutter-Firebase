@@ -125,15 +125,15 @@ class _LogContentsViewState extends State<LogContentsView> {
         }
 
         var line = lines[index];
-        var canBeFolded = line.contents.length > 256;
-        var longLine = canBeFolded && line.contents.length > 350;
+        var canBeFolded = line.contents.length > 512;
+        var longLine = canBeFolded;
         var alarm = line.alarm;
 
         var selectable = lineParams[line.index] != null
             ? lineParams[line.index].selectable
             : selectableText;
 
-        var defaultUnfoldedValue = !longLine || !canBeFolded;
+        var defaultUnfoldedValue = !longLine || !canBeFolded || alarm;
         var unfolded = lineParams[line.index] != null
             ? lineParams[line.index].unfolded
             : defaultUnfoldedValue;
@@ -143,8 +143,8 @@ class _LogContentsViewState extends State<LogContentsView> {
         if (!unfolded) {
           var firstLine = line.contents.split('\n')[0];
           contents = firstLine.length > 256
-              ? line.contents.substring(0, 256) + "..."
-              : firstLine;
+              ? line.contents.substring(0, 256) + "....."
+              : (firstLine + '\n.....');
         }
 
         var backColor = index % 2 != 0
@@ -159,11 +159,12 @@ class _LogContentsViewState extends State<LogContentsView> {
                 borderRadius: BorderRadius.circular(20.0),
                 border: Border.all(
                     color: alarm ? Color(0xFFC19652) : Color(0xFF000000),
-                    width: alarm ? 2 : 0)),
+                    width: alarm ? 2 : 1)),
             child: Padding(
-              padding: const EdgeInsets.only(top: 7, bottom: 3, left: 20),
+              padding: const EdgeInsets.only(top: 7, bottom: 7, left: 0),
               child:
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                _drawFoldWidgets(line, canBeFolded, unfolded, lineParams),
                 ConditionWidget(
                     condition: selectable,
                     widget: Expanded(
@@ -178,36 +179,11 @@ class _LogContentsViewState extends State<LogContentsView> {
                       padding: const EdgeInsets.only(right: 7),
                       child: Icon(Icons.error_outline),
                     )),
-               Padding(
-                      padding: const EdgeInsets.only(top: 4, left: 3),
-                      child: Text(line.index.toString(), style: _logIndexTextStyle),
-                    ),
-                ConditionWidget(
-                    condition: canBeFolded,
-                    widget: ConditionWidget(
-                        condition: unfolded,
-                        widget: IconButton(
-                            icon: Icon(Icons.unfold_less),
-                            alignment: Alignment.topCenter,
-                            color: Colors.grey,
-                            padding: const EdgeInsets.only(right: 5),
-                            onPressed: () => setState(() {
-                                  if (lineParams[line.index] == null) {
-                                    lineParams[line.index] = _LineOptions();
-                                  }
-                                  lineParams[line.index].unfolded = false;
-                                })),
-                        fallback: IconButton(
-                            icon: Icon(Icons.unfold_more),
-                            alignment: Alignment.topCenter,
-                            padding: const EdgeInsets.only(right: 5),
-                            onPressed: () => setState(() {
-                                  if (lineParams[line.index] == null) {
-                                    lineParams[line.index] = _LineOptions();
-                                  }
-                                  lineParams[line.index].unfolded = true;
-                                }))),
-                fallback: SizedBox(width: 40)),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4, left: 3),
+                  child: Text(line.index.toString(), style: _logIndexTextStyle),
+                ),
+                _drawFoldWidgets(line, canBeFolded, unfolded, lineParams),
                 IconButton(
                     icon: Icon(Icons.copy),
                     color: Colors.grey,
@@ -225,6 +201,37 @@ class _LogContentsViewState extends State<LogContentsView> {
         );
       },
     );
+  }
+
+  Widget _drawFoldWidgets(LogLine line, bool canBeFolded, bool unfolded,
+      Map<int, _LineOptions> lineParams) {
+    return ConditionWidget(
+        condition: canBeFolded,
+        widget: ConditionWidget(
+            condition: unfolded,
+            widget: IconButton(
+                icon: Icon(Icons.unfold_less),
+                alignment: Alignment.topCenter,
+                color: Colors.grey,
+                padding: const EdgeInsets.only(right: 5),
+                onPressed: () => setState(() {
+                      if (lineParams[line.index] == null) {
+                        lineParams[line.index] = _LineOptions();
+                      }
+                      lineParams[line.index].unfolded = false;
+                    })),
+            fallback: IconButton(
+                icon: Icon(Icons.unfold_more),
+                alignment: Alignment.topCenter,
+                color: Theme.of(context).colorScheme.primary,
+                padding: const EdgeInsets.only(right: 5),
+                onPressed: () => setState(() {
+                      if (lineParams[line.index] == null) {
+                        lineParams[line.index] = _LineOptions();
+                      }
+                      lineParams[line.index].unfolded = true;
+                    }))),
+        fallback: SizedBox(width: 40));
   }
 
   Widget _buildWebRawView() {
