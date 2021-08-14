@@ -2,7 +2,7 @@ import 'package:universal_html/html.dart' as html;
 
 class WebUtilities {
   static void openStringContentInNewPage(String contentToShow) {
-    final contents = '<html><body><pre>$contentToShow</pre></body></html>';
+    final contents = createHtmlForLogContents(contentToShow);
     final blob = html.Blob([contents], 'text/html');
     final url = html.Url.createObjectUrlFromBlob(blob);
     html.window.open(url, 'log');
@@ -20,5 +20,10 @@ class WebUtilities {
     anchor.click();
     html.document.body.children.remove(anchor);
     html.Url.revokeObjectUrl(url);
+  }
+
+  static String createHtmlForLogContents(
+      String rawContents) {
+    return '<html><body><pre>' + rawContents + '</pre></body></html>';
   }
 }

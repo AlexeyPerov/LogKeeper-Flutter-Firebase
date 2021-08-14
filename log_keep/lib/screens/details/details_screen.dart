@@ -31,9 +31,11 @@ class DetailsScreen extends StatelessWidget {
             drawer: DetailsDrawer(log: state.log),
             body: getWidgetForLoadedState(context, state.log));
       } else {
-        return Align(
-            alignment: Alignment.center,
-            child: LinearProgressIndicator());
+        return Scaffold(
+          appBar: null,
+          body: Align(
+              alignment: Alignment.center, child: LinearProgressIndicator()),
+        );
       }
     }));
   }

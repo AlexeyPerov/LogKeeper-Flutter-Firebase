@@ -36,9 +36,16 @@ class FirestoreLogsRepository extends LogsRepository {
       if (snapshot.docs == null || snapshot.docs.isEmpty) {
         return List<String>.filled(1, defaultProjectName, growable: false);
       }
-      return snapshot.docs.map((doc) {
-        return doc['name'].toString();
-      }).toSet().toList(growable: false);
+      var projects = snapshot.docs
+          .map((doc) {
+            return doc['name'].toString();
+          })
+          .toSet()
+          .toList(growable: false);
+
+      projects.sort((a, b) => b.compareTo(a));
+
+      return projects;
     });
   }
 
@@ -227,14 +234,24 @@ Stream<int> defaultStream() async* {
 class LogAnalysisEntity {
   final LogEntity originalLog;
   final List<LogLine> lines;
-  final int alarmsCount;
 
-  LogAnalysisEntity(this.originalLog, this.lines, this.alarmsCount);
+  final int alarmsCount;
+  final int cheatCount;
+  final int modelCount;
+  final int tutorialCount;
+
+  LogAnalysisEntity(this.originalLog, this.lines, this.alarmsCount,
+      this.cheatCount, this.modelCount, this.tutorialCount);
 }
 
 class LogLine {
+  final int index;
   final String contents;
   final bool alarm;
+  final bool cheat;
+  final bool model;
+  final bool tutorial;
 
-  LogLine(this.contents, this.alarm);
+  LogLine(this.index, this.contents, this.alarm, this.cheat, this.model,
+      this.tutorial);
 }

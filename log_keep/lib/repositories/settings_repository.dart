@@ -13,6 +13,9 @@ abstract class SettingsRepository {
 
   int getInt(String key, {int defaultValue = 0});
   void putInt(String key, int value);
+
+  bool getBool(String key, {bool defaultValue = false});
+  void putBool(String key, bool value);
 }
 
 class HiveSettingsRepository extends SettingsRepository {
@@ -54,6 +57,16 @@ class HiveSettingsRepository extends SettingsRepository {
 
   @override
   void putInt(String key, int value) {
+    Hive.box(_boxName).put(key, value);
+  }
+
+  @override
+  bool getBool(String key, {bool defaultValue = false}) {
+    return Hive.box(_boxName).get(key, defaultValue: defaultValue);
+  }
+
+  @override
+  void putBool(String key, bool value) {
     Hive.box(_boxName).put(key, value);
   }
 }

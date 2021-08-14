@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 const double kMinWebContainerWidth = 1250;
 const double systemTextScaleFactorOption = -1;
-const kPrimaryColor = Color(0xFF64B5F6);
+const kPrimaryColor = Color(0xFF34A8B3);
 const kPrimaryLightColor = Color(0xFFFFECDF);
 const kPrimaryGradientColor = LinearGradient(
   begin: Alignment.topLeft,

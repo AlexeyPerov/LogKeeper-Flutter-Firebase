@@ -4,16 +4,23 @@ import 'package:clipboard/clipboard.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:log_keep/app/theme/themes.dart';
+import 'package:log_keep/common/utilities/web_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:proviso/proviso.dart';
 import 'package:web_browser/web_browser.dart';
 import 'package:universal_html/html.dart' as html;
+import 'package:log_keep/common/utilities/color_extensions.dart';
 
 class LogContentsView extends StatefulWidget {
   final LogAnalysisEntity log;
   final int mode;
+  final bool webView;
 
-  LogContentsView({Key key, @required this.log, @required this.mode})
+  LogContentsView(
+      {Key key,
+      @required this.log,
+      @required this.mode,
+      @required this.webView})
       : super(key: key);
 
   @override
@@ -22,27 +29,94 @@ class LogContentsView extends StatefulWidget {
 
 class _LogContentsViewState extends State<LogContentsView> {
   var _lineParams = Map<int, _LineOptions>();
-  var _errorLineParams = Map<int, _LineOptions>();
+
+  var _logTextStyle = const TextStyle(
+      height: 1.5, fontSize: 14.0, letterSpacing: 0.75, wordSpacing: 1.1);
+
+  var _logIndexTextStyle = const TextStyle(
+      height: 1.2,
+      fontSize: 14.0,
+      letterSpacing: 0.5,
+      wordSpacing: 1,
+      color: Colors.grey);
 
   @override
   Widget build(BuildContext context) {
     if (widget.mode == 1) {
-      return _buildLogListView(widget.log.lines, _lineParams, false);
-    } else if (widget.mode == 2) {
+      final lines = widget.log.lines;
+
+      if (widget.webView) {
+        return _buildWebView(lines);
+      }
+
       return _buildLogListView(
-          widget.log.lines.where((x) => x.alarm).toList(growable: false),
-          _errorLineParams,
-          true);
+          lines: lines,
+          lineParams: _lineParams,
+          selectableText: false,
+          showAlarmIcons: true);
+    } else if (widget.mode == 2) {
+      final lines =
+          widget.log.lines.where((x) => x.alarm).toList(growable: false);
+
+      if (widget.webView) {
+        return _buildWebView(lines);
+      }
+
+      return _buildLogListView(
+          lines: lines,
+          lineParams: _lineParams,
+          selectableText: true,
+          showAlarmIcons: false);
+    } else if (widget.mode == 3) {
+      final lines =
+          widget.log.lines.where((x) => x.model).toList(growable: false);
+
+      if (widget.webView) {
+        return _buildWebView(lines);
+      }
+
+      return _buildLogListView(
+          lines: lines,
+          lineParams: _lineParams,
+          selectableText: true,
+          showAlarmIcons: true);
+    } else if (widget.mode == 4) {
+      final lines =
+          widget.log.lines.where((x) => x.cheat).toList(growable: false);
+
+      if (widget.webView) {
+        return _buildWebView(lines);
+      }
+
+      return _buildLogListView(
+          lines: lines,
+          lineParams: _lineParams,
+          selectableText: true,
+          showAlarmIcons: true);
+    } else if (widget.mode == 5) {
+      final lines =
+          widget.log.lines.where((x) => x.tutorial).toList(growable: false);
+
+      if (widget.webView) {
+        return _buildWebView(lines);
+      }
+
+      return _buildLogListView(
+          lines:
+              widget.log.lines.where((x) => x.tutorial).toList(growable: false),
+          lineParams: _lineParams,
+          selectableText: true,
+          showAlarmIcons: true);
     } else {
       return _buildWebRawView();
     }
   }
 
-  Widget _buildLogListView(List<LogLine> lines,
-      Map<int, _LineOptions> lineParams, bool selectableText) {
-    var textStyle = const TextStyle(
-        height: 1.2, fontSize: 14.0, letterSpacing: 0.5, wordSpacing: 1);
-
+  Widget _buildLogListView(
+      {List<LogLine> lines,
+      Map<int, _LineOptions> lineParams,
+      bool selectableText,
+      bool showAlarmIcons}) {
     return ListView.builder(
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
@@ -53,48 +127,63 @@ class _LogContentsViewState extends State<LogContentsView> {
         }
 
         var line = lines[index];
-        var canBeFolded = line.contents.length > 100;
-        var longLine = canBeFolded && line.contents.length > 300;
+        var canBeFolded = line.contents.length > 256;
+        var longLine = canBeFolded && line.contents.length > 350;
         var alarm = line.alarm;
 
-        var selectable = lineParams[index] != null
-            ? lineParams[index].selectable
+        var selectable = lineParams[line.index] != null
+            ? lineParams[line.index].selectable
             : selectableText;
 
-        var defaultUnfoldedValue = !longLine || alarm || !canBeFolded;
-        var unfolded = lineParams[index] != null
-            ? lineParams[index].unfolded
+        var defaultUnfoldedValue = !longLine || !canBeFolded;
+        var unfolded = lineParams[line.index] != null
+            ? lineParams[line.index].unfolded
             : defaultUnfoldedValue;
 
-        var contents =
-            unfolded ? line.contents : (line.contents.substring(0, 25) + "...");
+        var contents = line.contents;
+
+        if (!unfolded) {
+          var firstLine = line.contents.split('\n')[0];
+          contents = firstLine.length > 256
+              ? line.contents.substring(0, 256) + "..."
+              : firstLine;
+        }
 
         var backColor = index % 2 != 0
             ? Theme.of(context).colorScheme.background
             : Theme.of(context).colorScheme.onBackground;
 
         return Padding(
-          padding: const EdgeInsets.only(top: 5),
+          padding: const EdgeInsets.only(top: 7),
           child: Container(
             decoration: BoxDecoration(
                 color: backColor,
                 borderRadius: BorderRadius.circular(20.0),
                 border: Border.all(
-                    color: alarm ? Colors.orangeAccent : Color(0xFF000000),
+                    color: alarm ? Color(0xFFC19652) : Color(0xFF000000),
                     width: alarm ? 2 : 0)),
             child: Padding(
-              padding: const EdgeInsets.only(top: 10, left: 10),
+              padding: const EdgeInsets.only(top: 10, left: 20),
               child:
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 ConditionWidget(
                     condition: selectable,
                     widget: Expanded(
                         child: SelectableText(contents,
-                            style: textStyle,
+                            style: _logTextStyle,
                             toolbarOptions: commonToolbarOptions())),
                     fallback:
-                        Expanded(child: Text(contents, style: textStyle))),
-                ConditionWidget(condition: alarm, widget: Icon(Icons.whatshot)),
+                        Expanded(child: Text(contents, style: _logTextStyle))),
+                ConditionWidget(
+                    condition: showAlarmIcons && alarm,
+                    widget: Padding(
+                      padding: const EdgeInsets.only(right: 7),
+                      child: Icon(Icons.error_outline),
+                    )),
+               Padding(
+                      padding: const EdgeInsets.only(top: 4, left: 3),
+                      child: Text(line.index.toString(), style: _logIndexTextStyle),
+                    ),
                 ConditionWidget(
                     condition: canBeFolded,
                     widget: ConditionWidget(
@@ -105,21 +194,22 @@ class _LogContentsViewState extends State<LogContentsView> {
                             color: Colors.grey,
                             padding: const EdgeInsets.only(right: 5),
                             onPressed: () => setState(() {
-                                  if (lineParams[index] == null) {
-                                    lineParams[index] = _LineOptions();
+                                  if (lineParams[line.index] == null) {
+                                    lineParams[line.index] = _LineOptions();
                                   }
-                                  lineParams[index].unfolded = false;
+                                  lineParams[line.index].unfolded = false;
                                 })),
                         fallback: IconButton(
                             icon: Icon(Icons.unfold_more),
                             alignment: Alignment.topCenter,
                             padding: const EdgeInsets.only(right: 5),
                             onPressed: () => setState(() {
-                                  if (lineParams[index] == null) {
-                                    lineParams[index] = _LineOptions();
+                                  if (lineParams[line.index] == null) {
+                                    lineParams[line.index] = _LineOptions();
                                   }
-                                  lineParams[index].unfolded = true;
-                                })))),
+                                  lineParams[line.index].unfolded = true;
+                                }))),
+                fallback: SizedBox(width: 40)),
                 IconButton(
                     icon: Icon(Icons.copy),
                     color: Colors.grey,
@@ -140,8 +230,54 @@ class _LogContentsViewState extends State<LogContentsView> {
   }
 
   Widget _buildWebRawView() {
-    final contents =
-        '<html><body><pre>${widget.log.originalLog.data.contents}</pre></body></html>';
+    final textColor = Theme.of(context).textTheme.bodyText1.color;
+    final textRgb =
+        'rgb(${textColor.red}, ${textColor.green}, ${textColor.blue})';
+
+    final backColor = Theme.of(context).colorScheme.background;
+    final backRgb =
+        'rgb(${backColor.red}, ${backColor.green}, ${backColor.blue})';
+
+    var rawContents = widget.log.originalLog.data.contents;
+    final contents = '<html><body style="background-color:$backRgb">'
+            '<pre style="color:$textRgb">' +
+        rawContents +
+        '</pre></body></html>';
+
+    final blob = html.Blob([contents], 'text/html');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    var width = MediaQuery.of(context).size.width;
+    var browserWidth = min(850, width);
+    return Container(
+      padding: EdgeInsets.all(1),
+      decoration: BoxDecoration(color: Colors.grey[300]),
+      child: WebBrowser(
+          initialUrl: url,
+          iframeSettings: WebBrowserIFrameSettings(
+              width: '"' + browserWidth.toString() + '"'),
+          interactionSettings:
+              WebBrowserInteractionSettings(topBar: null, bottomBar: null)),
+    );
+  }
+
+  Widget _buildWebView(List<LogLine> lines) {
+    final textColor = Theme.of(context).textTheme.bodyText1.color;
+    final textRgb =
+        'rgb(${textColor.red}, ${textColor.green}, ${textColor.blue})';
+
+    final backColor = Theme.of(context).colorScheme.background;
+    final backRgb =
+        'rgb(${backColor.red}, ${backColor.green}, ${backColor.blue})';
+
+    var lineContents = '';
+
+    for (var line in lines) {
+      lineContents += '<pre style="color:$textRgb">' + line.contents + '</pre>';
+    }
+
+    final contents = '<html><body style="background-color:$backRgb">' +
+        lineContents +
+        '</body></html>';
     final blob = html.Blob([contents], 'text/html');
     final url = html.Url.createObjectUrlFromBlob(blob);
     var width = MediaQuery.of(context).size.width;

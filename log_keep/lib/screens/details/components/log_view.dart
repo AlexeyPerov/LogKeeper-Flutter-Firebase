@@ -8,6 +8,7 @@ import 'package:log_keep/common/utilities/web_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/repositories/settings_repository.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
+import 'package:proviso/proviso.dart';
 import 'log_contents_view.dart';
 
 class LogView extends StatefulWidget {
@@ -27,14 +28,17 @@ class LogView extends StatefulWidget {
 
   @override
   _LogViewState createState() =>
-      _LogViewState(settings.getInt("selected_log_mode"));
+      _LogViewState(settings.getInt("selected_log_mode"),
+          settings.getBool("selected_web_view_mode"));
 }
 
 class _LogViewState extends State<LogView> {
   int _mode;
+  bool _useWebView;
 
-  _LogViewState(int defaultMode) {
+  _LogViewState(int defaultMode, bool defaultUseWebView) {
     _mode = defaultMode;
+    _useWebView = defaultUseWebView;
   }
 
   @override
@@ -76,7 +80,9 @@ class _LogViewState extends State<LogView> {
                 onPressed: () {
                   if (_mode == 0)
                     setState(() {
-                      _mode = 1;
+                      // we need this because webView block all raycasts on top of it
+                      _useWebView = false;
+                      widget.settings.putBool("selected_web_view_mode", false);
                     });
                   widget.onDelete();
                 },
@@ -125,7 +131,8 @@ class _LogViewState extends State<LogView> {
             left: 10,
             right: 20,
           ),
-          child: LogContentsView(log: widget.log, mode: _mode),
+          child: LogContentsView(
+              log: widget.log, mode: _mode, webView: _useWebView),
         ),
       )
     ]);
@@ -135,21 +142,80 @@ class _LogViewState extends State<LogView> {
     return Row(
       children: [
         Spacer(),
-        _modeCard(Icons.web, "Raw", 0, 0),
-        _modeCard(Icons.view_headline, "Logs", 1, widget.log.lines.length),
-        _modeCard(Icons.error_outline, "Alarms", 2, widget.log.alarmsCount),
+        _modeCard(Icons.web, "Raw", 0, 0, false),
+        ConditionWidget(
+            condition: widget.log.alarmsCount > 0,
+            widget: _modeCard(Icons.error_outline, "Alarms", 2,
+                widget.log.alarmsCount, true)),
+        ConditionWidget(
+            condition: widget.log.lines.length > 0,
+            widget: _modeCard(
+                Icons.view_headline, "Logs", 1, widget.log.lines.length, true)),
+        ConditionWidget(
+            condition: widget.log.modelCount > 0,
+            widget: _modeCard(
+                Icons.view_headline, "Server", 3, widget.log.modelCount, true)),
+        ConditionWidget(
+            condition: widget.log.cheatCount > 0,
+            widget: _modeCard(
+                Icons.view_headline, "Cheat", 4, widget.log.cheatCount, true)),
+        ConditionWidget(
+            condition: widget.log.tutorialCount > 0,
+            widget: _modeCard(Icons.view_headline, "Tutorial", 5,
+                widget.log.tutorialCount, true)),
         _card(Icons.open_in_new_rounded, "New tab", () {
           WebUtilities.openStringContentInNewPage(
               widget.log.originalLog.data.contents);
         }),
         SizedBox(width: 25),
-        Spacer()
+        Spacer(),
+        IgnorePointer(
+          ignoring: _mode == 0,
+          child: Column(
+            children: [
+              IconButton(
+                  iconSize: 35,
+                  icon: Icon(Icons.request_page_outlined),
+                  color: _useWebView || _mode == 0
+                      ? Theme.of(context).colorScheme.primaryVariant
+                      : Colors.grey,
+                  onPressed: () {
+                    setState(() {
+                      _useWebView = true;
+                      widget.settings.putBool("selected_web_view_mode", true);
+                    });
+                  }),
+              Text("Web", style: TextStyle(fontSize: 10))
+            ],
+          ),
+        ),
+        ConditionWidget(
+          condition: _mode != 0,
+          widget: Column(
+            children: [
+              IconButton(
+                  iconSize: 35,
+                  icon: Icon(Icons.view_list),
+                  color: !_useWebView
+                      ? Theme.of(context).colorScheme.primaryVariant
+                      : Colors.grey,
+                  onPressed: () {
+                    setState(() {
+                      _useWebView = false;
+                      widget.settings.putBool("selected_web_view_mode", false);
+                    });
+                  }),
+              Text("Flutter", style: TextStyle(fontSize: 10))
+            ],
+          ),
+          fallback: SizedBox(width: 51),
+        )
       ],
     );
   }
 
-  Widget _modeCard(
-      IconData icon, String title, int index, int additionalCountInfo) {
+  Widget _modeCard(IconData icon, String title, int index,
+      int additionalCountInfo, bool canUseWebView) {
     var selected = _mode == index;
 
     return GestureDetector(
@@ -164,18 +230,19 @@ class _LogViewState extends State<LogView> {
         height: 80.0,
         width: 100.0,
         decoration: BoxDecoration(
-          color: selected ? kPrimaryColor : Theme.of(context).cardColor,
+          color: selected ? Theme.of(context).colorScheme.secondaryVariant : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [selected ? commonBoxShadow() : slightBoxShadow()],
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.all(15.0),
-              child: Text(title, overflow: TextOverflow.fade, maxLines: 2),
+              padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0),
+              child: Text(title, overflow: TextOverflow.fade, maxLines: 1),
             ),
+            Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -186,19 +253,18 @@ class _LogViewState extends State<LogView> {
                       : ""),
                 ),
                 Padding(
-                    padding: EdgeInsets.only(right: 15.0, bottom: 10.0),
-                    child: Icon(icon, size: 20))
+                  padding: EdgeInsets.only(right: 15.0, bottom: 10.0),
+                  child: Icon(icon),
+                ),
               ],
-            ),
+            )
           ],
         ),
       ),
     );
   }
 
-  Widget _card(
-      IconData icon, String title, Function onTap) {
-
+  Widget _card(IconData icon, String title, Function onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -206,7 +272,7 @@ class _LogViewState extends State<LogView> {
         height: 80.0,
         width: 100.0,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondaryVariant,
+          color: Theme.of(context).colorScheme.secondary,
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [slightBoxShadow()],
         ),
