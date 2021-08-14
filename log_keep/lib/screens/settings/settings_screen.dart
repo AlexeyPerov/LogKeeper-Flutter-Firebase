@@ -3,7 +3,6 @@ import 'package:log_keep/app/app.dart';
 import 'package:log_keep/app/options/app_options.dart';
 import 'package:log_keep/app/theme/theme_constants.dart';
 import 'package:log_keep/app/theme/themes.dart';
-import 'package:log_keep/common/utilities/navigator_utilities.dart';
 import 'package:log_keep/repositories/settings_repository.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
 
@@ -22,7 +21,8 @@ class SettingsScreen extends StatelessWidget {
             children: [
               Spacer(),
               drawThemeModeCard(context, Icons.sync, ThemeMode.system),
-              drawThemeModeCard(context, Icons.lightbulb_outline, ThemeMode.light),
+              drawThemeModeCard(
+                  context, Icons.lightbulb_outline, ThemeMode.light),
               drawThemeModeCard(context, Icons.lightbulb, ThemeMode.dark),
               Spacer()
             ],
@@ -37,8 +37,7 @@ class SettingsScreen extends StatelessWidget {
                     .copyWith(fontWeight: FontWeight.bold),
               ),
               onPressed: () {
-                NavigatorUtilities.pushAndRemoveUntil(
-                    context, (c) => HomeScreen());
+                HomeScreenNavigation.navigate(context);
               }),
         ],
       ),
@@ -46,7 +45,8 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-Widget drawThemeModeCard(BuildContext context, IconData icon, ThemeMode themeMode) {
+Widget drawThemeModeCard(
+    BuildContext context, IconData icon, ThemeMode themeMode) {
   var selected = AppOptions.of(context).themeMode == themeMode;
 
   return GestureDetector(
@@ -71,10 +71,7 @@ Widget drawThemeModeCard(BuildContext context, IconData icon, ThemeMode themeMod
           Padding(
             padding: EdgeInsets.only(left: 25.0, top: 30.0),
             child: Text(
-                themeMode
-                    .toString()
-                    .replaceAll("ThemeMode.", "")
-                    .toUpperCase(),
+                themeMode.toString().replaceAll("ThemeMode.", "").toUpperCase(),
                 overflow: TextOverflow.fade,
                 maxLines: 2),
           ),

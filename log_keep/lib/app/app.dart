@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:log_keep/bloc/loggable_bloc_observer.dart';
+import 'package:log_keep/repositories/auth_repository.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:logger/logger.dart';
 
@@ -24,6 +25,10 @@ class App {
     }
 
     firebaseApp = await Firebase.initializeApp();
+
+    getIt.registerSingleton<AuthRepository>(
+        FirebaseAuthRepository(),
+        signalsReady: true);
 
     getIt.registerSingleton<LogsRepository>(
         FirestoreLogsRepository(FirebaseFirestore.instance),

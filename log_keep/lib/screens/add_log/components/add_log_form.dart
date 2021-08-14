@@ -7,7 +7,6 @@ import 'package:log_keep/app/app.dart';
 import 'package:log_keep/app/configs.dart';
 import 'package:log_keep/app/theme/theme_constants.dart';
 import 'package:log_keep/app/theme/themes.dart';
-import 'package:log_keep/common/utilities/navigator_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
 import 'package:uiblock/uiblock.dart';
@@ -53,8 +52,7 @@ class _AddLogFormState extends State<AddLogForm> {
                   width: 40,
                   child: IconButton(
                       icon: Icon(Icons.arrow_back_ios, size: 25),
-                      onPressed: () => NavigatorUtilities.pushAndRemoveUntil(
-                          context, (c) => HomeScreen())))
+                      onPressed: () => HomeScreenNavigation.navigate(context)))
             ],
           ),
         ),
@@ -203,7 +201,7 @@ class _AddLogFormState extends State<AddLogForm> {
 
   void _additionCompleted(BuildContext context) {
     UIBlock.unblock(context);
-    NavigatorUtilities.pushAndRemoveUntil(context, (c) => HomeScreen());
+    HomeScreenNavigation.navigate(context);
   }
 
   void _copyLink(BuildContext context, String id) {

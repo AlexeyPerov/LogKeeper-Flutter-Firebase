@@ -7,14 +7,16 @@ import 'package:log_keep/app/theme/theme_constants.dart';
 import 'package:log_keep/bloc/global/events_stream.dart';
 import 'package:log_keep/bloc/projects/projects.dart';
 import 'package:log_keep/bloc/log_infos/log_infos.dart';
+import 'package:log_keep/common/utilities/navigator_utilities.dart';
+import 'package:log_keep/repositories/auth_repository.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/repositories/settings_repository.dart';
+import 'package:log_keep/screens/auth/auth_screen.dart';
 import 'package:log_keep/screens/home/components/home_drawer.dart';
 import 'dart:math';
 import 'components/logs_list.dart';
 
 class HomeScreen extends StatefulWidget {
-  static String routeName = "/home";
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -22,6 +24,21 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+    final authRepository = getIt<AuthRepository>();
+    if (!authRepository.isLoggedIn()) {
+      return TextButton(
+          child: Text(
+            "Authorize".toUpperCase(),
+            style: Theme.of(context)
+                .textTheme
+                .headline6
+                .copyWith(fontWeight: FontWeight.bold),
+          ),
+          onPressed: () {
+            HomeScreenNavigation.navigate(context);
+          });
+    }
+
     return MultiBlocProvider(
       providers: [
         BlocProvider<ProjectsBloc>(
@@ -70,5 +87,16 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           })),
     );
+  }
+}
+
+class HomeScreenNavigation {
+  static navigate(BuildContext context) {
+    final authRepository = getIt<AuthRepository>();
+    if (authRepository.isLoggedIn()) {
+      NavigatorUtilities.pushAndRemoveUntil(context, (context) => HomeScreen());
+    } else {
+      NavigatorUtilities.pushAndRemoveUntil(context, (context) => AuthScreen());
+    }
   }
 }

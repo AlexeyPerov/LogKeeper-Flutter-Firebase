@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:log_keep/bloc/global/events_stream.dart';
+import 'package:log_keep/repositories/auth_repository.dart';
 import 'package:log_keep/repositories/settings_repository.dart';
+import 'package:log_keep/screens/auth/auth_screen.dart';
 import 'package:log_keep/screens/details/details_screen.dart';
 import 'package:log_keep/screens/error/error_screen.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
@@ -56,7 +58,6 @@ class AppWidget extends StatelessWidget {
       darkTheme: AppThemeData.darkThemeData.copyWith(
         platform: AppOptions.of(context).platform,
       ),
-      initialRoute: HomeScreen.routeName,
       onGenerateRoute: _generateRoute,
     );
   }
@@ -87,10 +88,16 @@ class AppWidget extends StatelessWidget {
                 arguments: LogDetailsLoadArguments(logId: routingData['id']))));
         break;
     }
-
-    return MaterialPageRoute(
-      builder: (context) => _redirectOnAppInit(() => HomeScreen()),
-    );
+    final authRepository = getIt<AuthRepository>();
+    if (authRepository.isLoggedIn()) {
+      return MaterialPageRoute(
+        builder: (context) => _redirectOnAppInit(() => HomeScreen()),
+      );
+    } else {
+      return MaterialPageRoute(
+        builder: (context) => _redirectOnAppInit(() => AuthScreen()),
+      );
+    }
   }
 }
 

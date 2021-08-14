@@ -4,12 +4,10 @@ import 'package:clipboard/clipboard.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:log_keep/app/theme/themes.dart';
-import 'package:log_keep/common/utilities/web_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:proviso/proviso.dart';
 import 'package:web_browser/web_browser.dart';
 import 'package:universal_html/html.dart' as html;
-import 'package:log_keep/common/utilities/color_extensions.dart';
 
 class LogContentsView extends StatefulWidget {
   final LogAnalysisEntity log;

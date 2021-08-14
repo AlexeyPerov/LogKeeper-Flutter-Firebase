@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:log_keep/app/app.dart';
 import 'package:log_keep/bloc/log_contents/log_contents.dart';
-import 'package:log_keep/common/utilities/navigator_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/repositories/settings_repository.dart';
 import 'package:log_keep/screens/details/services/log_deletion_service.dart';
@@ -75,11 +74,7 @@ class DetailsScreen extends StatelessWidget {
   void deleteLog(BuildContext context, LogAnalysisEntity log) {
     LogDeletionService.requestDeletion(
             context, log.originalLog.project, log.originalLog.info)
-        .then((result) => {
-              if (result)
-                NavigatorUtilities.pushWithNoTransition(
-                    context, (_, __, ___) => HomeScreen())
-            });
+        .then((result) => {if (result) HomeScreenNavigation.navigate(context)});
   }
 }
 

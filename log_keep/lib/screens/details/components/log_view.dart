@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:log_keep/app/configs.dart';
 import 'package:log_keep/app/theme/theme_constants.dart';
 import 'package:log_keep/app/theme/themes.dart';
-import 'package:log_keep/common/utilities/navigator_utilities.dart';
 import 'package:log_keep/common/utilities/web_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/repositories/settings_repository.dart';
@@ -27,9 +26,9 @@ class LogView extends StatefulWidget {
         super(key: key);
 
   @override
-  _LogViewState createState() =>
-      _LogViewState(settings.getInt("selected_log_mode"),
-          settings.getBool("selected_web_view_mode"));
+  _LogViewState createState() => _LogViewState(
+      settings.getInt("selected_log_mode"),
+      settings.getBool("selected_web_view_mode"));
 }
 
 class _LogViewState extends State<LogView> {
@@ -49,8 +48,7 @@ class _LogViewState extends State<LogView> {
         child: Row(children: [
           IconButton(
             padding: EdgeInsets.zero,
-            onPressed: () =>
-                NavigatorUtilities.pop(context, (c) => HomeScreen()),
+            onPressed: () => HomeScreenNavigation.navigate(context),
             icon: Icon(Icons.arrow_back_ios, size: 25),
           ),
           Expanded(
@@ -230,7 +228,9 @@ class _LogViewState extends State<LogView> {
         height: 80.0,
         width: 100.0,
         decoration: BoxDecoration(
-          color: selected ? Theme.of(context).colorScheme.secondaryVariant : Theme.of(context).cardColor,
+          color: selected
+              ? Theme.of(context).colorScheme.secondaryVariant
+              : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [selected ? commonBoxShadow() : slightBoxShadow()],
         ),
