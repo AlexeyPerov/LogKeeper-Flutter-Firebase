@@ -49,9 +49,12 @@ class HomeDrawer extends StatelessWidget {
                       MaterialPageRoute(builder: (c) => SettingsScreen()));
                 }),
             SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0),
-              child: Text('Logged in:\n' + getIt<AuthRepository>().loggedInEmail(), maxLines: 2, overflow: TextOverflow.fade, style: TextStyle(fontSize: 13, height: 1.2)),
+            ConditionWidget(
+              condition: getIt<AuthRepository>().isLoggedIn(),
+              widget: Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: Text('Logged in:\n' + getIt<AuthRepository>().loggedInEmail(), maxLines: 2, overflow: TextOverflow.fade, style: TextStyle(fontSize: 13, height: 1.2)),
+              ),
             ),
             ConditionWidget(
               condition: getIt<AuthRepository>().isLoggedIn(),

@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final authRepository = getIt<AuthRepository>();
-    if (!authRepository.isLoggedIn()) {
+    if (!authRepository.isLoggedIn() && authRepository.isRequired()) {
       return TextButton(
           child: Text(
             "Authorize".toUpperCase(),
@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
 class HomeScreenNavigation {
   static navigate(BuildContext context) {
     final authRepository = getIt<AuthRepository>();
-    if (authRepository.isLoggedIn()) {
+    if (authRepository.isLoggedIn() || !authRepository.isRequired()) {
       NavigatorUtilities.pushAndRemoveUntil(context, (context) => HomeScreen());
     } else {
       NavigatorUtilities.pushAndRemoveUntil(context, (context) => AuthScreen());

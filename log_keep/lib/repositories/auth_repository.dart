@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 abstract class AuthRepository {
   Future initialize();
+  bool isRequired();
   bool isLoggedIn();
   String loggedInEmail();
   Future<void> logout();
@@ -16,6 +18,10 @@ class FirebaseAuthRepository extends AuthRepository {
   @override
   Future initialize() {
     return Future.value();
+  }
+
+  bool isRequired() {
+    return kReleaseMode;
   }
 
   bool isLoggedIn() {

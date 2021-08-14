@@ -89,7 +89,7 @@ class AppWidget extends StatelessWidget {
         break;
     }
     final authRepository = getIt<AuthRepository>();
-    if (authRepository.isLoggedIn()) {
+    if (authRepository.isLoggedIn() || !authRepository.isRequired()) {
       return MaterialPageRoute(
         builder: (context) => _redirectOnAppInit(() => HomeScreen()),
       );
