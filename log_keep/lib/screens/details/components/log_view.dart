@@ -169,28 +169,37 @@ class _LogViewState extends State<LogView> {
         }),
         SizedBox(width: 25),
         Spacer(),
-        IconButton(
-            icon: Icon(Icons.request_page_outlined),
-            color: _useWebView
-                ? Theme.of(context).colorScheme.primaryVariant
-                : Colors.grey,
-            onPressed: () {
-              setState(() {
-                _useWebView = true;
-                widget.settings.putBool("selected_web_view_mode", true);
-              });
-            }),
-        IconButton(
-            icon: Icon(Icons.view_list),
-            color: !_useWebView
-                ? Theme.of(context).colorScheme.primaryVariant
-                : Colors.grey,
-            onPressed: () {
-              setState(() {
-                _useWebView = false;
-                widget.settings.putBool("selected_web_view_mode", false);
-              });
-            })
+        IgnorePointer(
+          ignoring: _mode == 0,
+          child: IconButton(
+              iconSize: 35,
+              icon: Icon(Icons.request_page_outlined),
+              color: _useWebView || _mode == 0
+                  ? Theme.of(context).colorScheme.primaryVariant
+                  : Colors.grey,
+              onPressed: () {
+                setState(() {
+                  _useWebView = true;
+                  widget.settings.putBool("selected_web_view_mode", true);
+                });
+              }),
+        ),
+        ConditionWidget(
+          condition: _mode != 0,
+          widget: IconButton(
+              iconSize: 35,
+              icon: Icon(Icons.view_list),
+              color: !_useWebView
+                  ? Theme.of(context).colorScheme.primaryVariant
+                  : Colors.grey,
+              onPressed: () {
+                setState(() {
+                  _useWebView = false;
+                  widget.settings.putBool("selected_web_view_mode", false);
+                });
+              }),
+          fallback: SizedBox(width: 51),
+        )
       ],
     );
   }

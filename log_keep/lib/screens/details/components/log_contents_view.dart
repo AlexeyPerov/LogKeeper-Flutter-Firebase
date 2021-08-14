@@ -127,8 +127,8 @@ class _LogContentsViewState extends State<LogContentsView> {
         }
 
         var line = lines[index];
-        var canBeFolded = line.contents.length > 100;
-        var longLine = canBeFolded && line.contents.length > 256;
+        var canBeFolded = line.contents.length > 256;
+        var longLine = canBeFolded && line.contents.length > 350;
         var alarm = line.alarm;
 
         var selectable = lineParams[line.index] != null
@@ -144,8 +144,8 @@ class _LogContentsViewState extends State<LogContentsView> {
 
         if (!unfolded) {
           var firstLine = line.contents.split('\n')[0];
-          contents = firstLine.length > 128
-              ? line.contents.substring(0, 128) + "..."
+          contents = firstLine.length > 256
+              ? line.contents.substring(0, 256) + "..."
               : firstLine;
         }
 
@@ -180,10 +180,6 @@ class _LogContentsViewState extends State<LogContentsView> {
                       padding: const EdgeInsets.only(right: 7),
                       child: Icon(Icons.error_outline),
                     )),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4, right: 3),
-                  child: Text(line.index.toString(), style: _logIndexTextStyle),
-                ),
                 ConditionWidget(
                     condition: canBeFolded,
                     widget: ConditionWidget(
@@ -209,6 +205,10 @@ class _LogContentsViewState extends State<LogContentsView> {
                                   }
                                   lineParams[line.index].unfolded = true;
                                 })))),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4, right: 3),
+                  child: Text(line.index.toString(), style: _logIndexTextStyle),
+                ),
                 IconButton(
                     icon: Icon(Icons.copy),
                     color: Colors.grey,
@@ -229,8 +229,20 @@ class _LogContentsViewState extends State<LogContentsView> {
   }
 
   Widget _buildWebRawView() {
+    final textColor = Theme.of(context).textTheme.bodyText1.color;
+    final textRgb =
+        'rgb(${textColor.red}, ${textColor.green}, ${textColor.blue})';
+
+    final backColor = Theme.of(context).colorScheme.background;
+    final backRgb =
+        'rgb(${backColor.red}, ${backColor.green}, ${backColor.blue})';
+
     var rawContents = widget.log.originalLog.data.contents;
-    final contents = WebUtilities.createHtmlForLogContents(rawContents);
+    final contents = '<html><body style="background-color:$backRgb">'
+            '<pre style="color:$textRgb">' +
+        rawContents +
+        '</pre></body></html>';
+
     final blob = html.Blob([contents], 'text/html');
     final url = html.Url.createObjectUrlFromBlob(blob);
     var width = MediaQuery.of(context).size.width;
@@ -251,7 +263,6 @@ class _LogContentsViewState extends State<LogContentsView> {
     final textColor = Theme.of(context).textTheme.bodyText1.color;
     final textRgb =
         'rgb(${textColor.red}, ${textColor.green}, ${textColor.blue})';
-    ;
 
     final backColor = Theme.of(context).colorScheme.background;
     final backRgb =
