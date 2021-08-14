@@ -41,6 +41,10 @@ class LogContentsBloc extends Bloc<LogContentsEvent, LogContentsState> {
     for (int i = 0; i < linesRaw.length; i++) {
       var rawLine = linesRaw[i];
 
+      if (rawLine.endsWith('\n')) {
+        rawLine = rawLine.replaceRange(rawLine.length - 1, rawLine.length, '');
+      }
+
       final cheatCount = cheatExp.allMatches(rawLine).length;
       final tutorialCount = tutorialExp.allMatches(rawLine).length;
       final modelCount = modelExp.allMatches(rawLine).length;
