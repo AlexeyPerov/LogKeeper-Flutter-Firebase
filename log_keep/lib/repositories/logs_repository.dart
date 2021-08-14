@@ -36,12 +36,16 @@ class FirestoreLogsRepository extends LogsRepository {
       if (snapshot.docs == null || snapshot.docs.isEmpty) {
         return List<String>.filled(1, defaultProjectName, growable: false);
       }
-      return snapshot.docs
+      var projects = snapshot.docs
           .map((doc) {
             return doc['name'].toString();
           })
           .toSet()
           .toList(growable: false);
+
+      projects.sort((a, b) => b.compareTo(a));
+
+      return projects;
     });
   }
 

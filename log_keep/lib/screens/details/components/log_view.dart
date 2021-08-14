@@ -144,24 +144,24 @@ class _LogViewState extends State<LogView> {
         Spacer(),
         _modeCard(Icons.web, "Raw", 0, 0, false),
         ConditionWidget(
-            condition: widget.log.lines.length > 0,
-            widget: _modeCard(
-                Icons.view_headline, "Logs", 1, widget.log.lines.length, true)),
-        ConditionWidget(
             condition: widget.log.alarmsCount > 0,
             widget: _modeCard(Icons.error_outline, "Alarms", 2,
                 widget.log.alarmsCount, true)),
         ConditionWidget(
+            condition: widget.log.lines.length > 0,
+            widget: _modeCard(
+                Icons.view_headline, "Logs", 1, widget.log.lines.length, true)),
+        ConditionWidget(
             condition: widget.log.modelCount > 0,
             widget: _modeCard(
-                Icons.error_outline, "Server", 3, widget.log.modelCount, true)),
+                Icons.view_headline, "Server", 3, widget.log.modelCount, true)),
         ConditionWidget(
             condition: widget.log.cheatCount > 0,
             widget: _modeCard(
-                Icons.error_outline, "Cheat", 4, widget.log.cheatCount, true)),
+                Icons.view_headline, "Cheat", 4, widget.log.cheatCount, true)),
         ConditionWidget(
             condition: widget.log.tutorialCount > 0,
-            widget: _modeCard(Icons.error_outline, "Tutorial", 5,
+            widget: _modeCard(Icons.view_headline, "Tutorial", 5,
                 widget.log.tutorialCount, true)),
         _card(Icons.open_in_new_rounded, "New tab", () {
           WebUtilities.openStringContentInNewPage(
@@ -171,33 +171,43 @@ class _LogViewState extends State<LogView> {
         Spacer(),
         IgnorePointer(
           ignoring: _mode == 0,
-          child: IconButton(
-              iconSize: 35,
-              icon: Icon(Icons.request_page_outlined),
-              color: _useWebView || _mode == 0
-                  ? Theme.of(context).colorScheme.primaryVariant
-                  : Colors.grey,
-              onPressed: () {
-                setState(() {
-                  _useWebView = true;
-                  widget.settings.putBool("selected_web_view_mode", true);
-                });
-              }),
+          child: Column(
+            children: [
+              IconButton(
+                  iconSize: 35,
+                  icon: Icon(Icons.request_page_outlined),
+                  color: _useWebView || _mode == 0
+                      ? Theme.of(context).colorScheme.primaryVariant
+                      : Colors.grey,
+                  onPressed: () {
+                    setState(() {
+                      _useWebView = true;
+                      widget.settings.putBool("selected_web_view_mode", true);
+                    });
+                  }),
+              Text("Web", style: TextStyle(fontSize: 10))
+            ],
+          ),
         ),
         ConditionWidget(
           condition: _mode != 0,
-          widget: IconButton(
-              iconSize: 35,
-              icon: Icon(Icons.view_list),
-              color: !_useWebView
-                  ? Theme.of(context).colorScheme.primaryVariant
-                  : Colors.grey,
-              onPressed: () {
-                setState(() {
-                  _useWebView = false;
-                  widget.settings.putBool("selected_web_view_mode", false);
-                });
-              }),
+          widget: Column(
+            children: [
+              IconButton(
+                  iconSize: 35,
+                  icon: Icon(Icons.view_list),
+                  color: !_useWebView
+                      ? Theme.of(context).colorScheme.primaryVariant
+                      : Colors.grey,
+                  onPressed: () {
+                    setState(() {
+                      _useWebView = false;
+                      widget.settings.putBool("selected_web_view_mode", false);
+                    });
+                  }),
+              Text("Flutter", style: TextStyle(fontSize: 10))
+            ],
+          ),
           fallback: SizedBox(width: 51),
         )
       ],
@@ -220,7 +230,7 @@ class _LogViewState extends State<LogView> {
         height: 80.0,
         width: 100.0,
         decoration: BoxDecoration(
-          color: selected ? kPrimaryColor : Theme.of(context).cardColor,
+          color: selected ? Theme.of(context).colorScheme.secondaryVariant : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [selected ? commonBoxShadow() : slightBoxShadow()],
         ),
@@ -241,7 +251,11 @@ class _LogViewState extends State<LogView> {
                   child: Text(additionalCountInfo != 0
                       ? additionalCountInfo.toString()
                       : ""),
-                )
+                ),
+                Padding(
+                  padding: EdgeInsets.only(right: 15.0, bottom: 10.0),
+                  child: Icon(icon),
+                ),
               ],
             )
           ],

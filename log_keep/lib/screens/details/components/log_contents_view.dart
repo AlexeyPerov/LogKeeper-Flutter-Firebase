@@ -31,7 +31,7 @@ class _LogContentsViewState extends State<LogContentsView> {
   var _lineParams = Map<int, _LineOptions>();
 
   var _logTextStyle = const TextStyle(
-      height: 1.2, fontSize: 14.0, letterSpacing: 0.5, wordSpacing: 1);
+      height: 1.5, fontSize: 14.0, letterSpacing: 0.75, wordSpacing: 1.1);
 
   var _logIndexTextStyle = const TextStyle(
       height: 1.2,
@@ -154,16 +154,16 @@ class _LogContentsViewState extends State<LogContentsView> {
             : Theme.of(context).colorScheme.onBackground;
 
         return Padding(
-          padding: const EdgeInsets.only(top: 5),
+          padding: const EdgeInsets.only(top: 7),
           child: Container(
             decoration: BoxDecoration(
                 color: backColor,
                 borderRadius: BorderRadius.circular(20.0),
                 border: Border.all(
-                    color: alarm ? Colors.orangeAccent : Color(0xFF000000),
+                    color: alarm ? Color(0xFFC19652) : Color(0xFF000000),
                     width: alarm ? 2 : 0)),
             child: Padding(
-              padding: const EdgeInsets.only(top: 10, left: 10),
+              padding: const EdgeInsets.only(top: 10, left: 20),
               child:
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 ConditionWidget(
@@ -180,6 +180,10 @@ class _LogContentsViewState extends State<LogContentsView> {
                       padding: const EdgeInsets.only(right: 7),
                       child: Icon(Icons.error_outline),
                     )),
+               Padding(
+                      padding: const EdgeInsets.only(top: 4, left: 3),
+                      child: Text(line.index.toString(), style: _logIndexTextStyle),
+                    ),
                 ConditionWidget(
                     condition: canBeFolded,
                     widget: ConditionWidget(
@@ -204,11 +208,8 @@ class _LogContentsViewState extends State<LogContentsView> {
                                     lineParams[line.index] = _LineOptions();
                                   }
                                   lineParams[line.index].unfolded = true;
-                                })))),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4, right: 3),
-                  child: Text(line.index.toString(), style: _logIndexTextStyle),
-                ),
+                                }))),
+                fallback: SizedBox(width: 40)),
                 IconButton(
                     icon: Icon(Icons.copy),
                     color: Colors.grey,

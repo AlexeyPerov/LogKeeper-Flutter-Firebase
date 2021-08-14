@@ -99,7 +99,7 @@ class _LogsListState extends State<LogsList> {
         height: height,
         width: 175.0,
         decoration: BoxDecoration(
-          color: selected ? kPrimaryColor : Theme.of(context).cardColor,
+          color: selected ? Theme.of(context).colorScheme.secondaryVariant  : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [selected ? commonBoxShadow() : slightBoxShadow()],
         ),
@@ -137,7 +137,7 @@ class _LogsListState extends State<LogsList> {
                   Padding(
                     padding: EdgeInsets.only(right: 20.0),
                     child: IconButton(
-                        icon: Icon(Icons.archive, size: 25),
+                        icon: Icon(Icons.archive_outlined, size: 22),
                         onPressed: () {
                           ProjectArchivingService.requestArchiving(
                               context, projectInfo.project);
@@ -153,6 +153,8 @@ class _LogsListState extends State<LogsList> {
   }
 
   Widget _logCard(BuildContext context, LogInfoEntity logInfo) {
+    var logTextStyle = const TextStyle(
+        fontSize: 14.0);
     var title = logInfo.title.splitWordsByLength(kIsWeb ? 64 : 32);
 
     return Container(
@@ -173,26 +175,26 @@ class _LogsListState extends State<LogsList> {
             Align(
               alignment: Alignment.topLeft,
               child: Text(title.item1,
-                  overflow: TextOverflow.ellipsis, maxLines: 1),
+                  overflow: TextOverflow.ellipsis, maxLines: 1, style: logTextStyle),
             ),
             SizedBox(height: 10.0),
             Align(
               alignment: Alignment.topLeft,
               child: Text(title.item2,
-                  overflow: TextOverflow.ellipsis, maxLines: 1),
+                  overflow: TextOverflow.ellipsis, maxLines: 1, style: logTextStyle),
             ),
             SizedBox(height: 5.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Text(dateFormatter.format(logInfo.createdAt)),
+                Text(dateFormatter.format(logInfo.createdAt), style: logTextStyle),
                 SizedBox(width: 10.0),
-                Text(timeFormatter.format(logInfo.createdAt)),
+                Text(timeFormatter.format(logInfo.createdAt), style: logTextStyle),
                 SizedBox(width: 10.0),
                 ConditionWidget(
                   condition: kIsWeb,
-                  widget: Text(logInfo.author, maxLines: 1),
+                  widget: Text(logInfo.author, maxLines: 1, style: logTextStyle),
                 ),
                 Spacer(),
                 ConditionWidget(

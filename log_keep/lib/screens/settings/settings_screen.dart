@@ -58,7 +58,7 @@ Widget drawThemeModeCard(BuildContext context, IconData icon, ThemeMode themeMod
     child: Container(
       margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       height: 120.0,
-      width: 160.0,
+      width: 250.0,
       decoration: BoxDecoration(
         color: selected ? kPrimaryColor : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20.0),

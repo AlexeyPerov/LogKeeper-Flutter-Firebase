@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppThemeData {
-  static const _lightFillColor = Colors.black;
-  static const _darkFillColor = Colors.white;
+  static const _lightFillColor = Colors.black54;
+  static const _darkFillColor = Color(0xE6DCDCDC);
 
   static final Color _lightFocusColor = Colors.black.withOpacity(0.12);
   static final Color _darkFocusColor = Colors.white.withOpacity(0.12);
 
   static ThemeData lightThemeData =
-  themeData(lightColorScheme, _lightFocusColor);
+      themeData(lightColorScheme, _lightFocusColor);
   static ThemeData darkThemeData = themeData(darkColorScheme, _darkFocusColor);
 
   static ThemeData themeData(ColorScheme colorScheme, Color focusColor) {
     return ThemeData(
       colorScheme: colorScheme,
-      textTheme: _textTheme,
+      textTheme: _textTheme.apply(bodyColor: colorScheme.onPrimary, displayColor: colorScheme.onPrimary),
       primaryColor: const Color(0xFF030303),
       appBarTheme: AppBarTheme(
         textTheme: _textTheme.apply(bodyColor: colorScheme.onPrimary),
@@ -110,5 +110,6 @@ minorBoxShadow() {
 }
 
 commonToolbarOptions() {
-  return const ToolbarOptions(copy: true, selectAll: true, cut: false, paste: false);
+  return const ToolbarOptions(
+      copy: true, selectAll: true, cut: false, paste: false);
 }
