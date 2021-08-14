@@ -58,9 +58,5 @@ dependencies:
   hive: ^2.0.4
   path_provider: ^2.0.2
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
 flutter:
   uses-material-design: true
