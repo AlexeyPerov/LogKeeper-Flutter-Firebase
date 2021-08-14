@@ -101,7 +101,7 @@ class _LogsListState extends State<LogsList> {
         decoration: BoxDecoration(
           color: selected ? Theme.of(context).colorScheme.secondaryVariant  : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20.0),
-          boxShadow: [selected ? commonBoxShadow() : slightBoxShadow()],
+          boxShadow: [selected ? heavyBoxShadow() : slightBoxShadow()],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

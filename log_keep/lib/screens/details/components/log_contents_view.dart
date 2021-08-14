@@ -152,7 +152,7 @@ class _LogContentsViewState extends State<LogContentsView> {
             : Theme.of(context).colorScheme.onBackground;
 
         return Padding(
-          padding: const EdgeInsets.only(top: 7),
+          padding: const EdgeInsets.only(top: 5),
           child: Container(
             decoration: BoxDecoration(
                 color: backColor,
@@ -161,7 +161,7 @@ class _LogContentsViewState extends State<LogContentsView> {
                     color: alarm ? Color(0xFFC19652) : Color(0xFF000000),
                     width: alarm ? 2 : 0)),
             child: Padding(
-              padding: const EdgeInsets.only(top: 10, left: 20),
+              padding: const EdgeInsets.only(top: 7, bottom: 3, left: 20),
               child:
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 ConditionWidget(

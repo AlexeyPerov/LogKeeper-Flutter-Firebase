@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppThemeData {
-  static const _lightFillColor = Colors.black54;
+  static const _lightFillColor = Colors.black87;
   static const _darkFillColor = Color(0xE6DCDCDC);
 
   static final Color _lightFocusColor = Colors.black.withOpacity(0.12);
@@ -92,6 +92,11 @@ class AppThemeData {
     headline6: GoogleFonts.montserrat(fontWeight: _bold, fontSize: 16.0),
     button: GoogleFonts.montserrat(fontWeight: _semiBold, fontSize: 14.0),
   );
+}
+
+heavyBoxShadow() {
+  return const BoxShadow(
+      color: Color(0xB3000000), offset: Offset(0, 4), blurRadius: 10.0);
 }
 
 commonBoxShadow() {

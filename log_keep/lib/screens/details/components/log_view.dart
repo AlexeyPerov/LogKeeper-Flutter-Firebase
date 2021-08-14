@@ -78,7 +78,7 @@ class _LogViewState extends State<LogView> {
                 onPressed: () {
                   if (_mode == 0)
                     setState(() {
-                      // we need this because webView block all raycasts on top of it
+                      // we need this because webView block all ray casts on top of it
                       _useWebView = false;
                       widget.settings.putBool("selected_web_view_mode", false);
                     });
@@ -161,6 +161,7 @@ class _LogViewState extends State<LogView> {
             condition: widget.log.tutorialCount > 0,
             widget: _modeCard(Icons.view_headline, "Tutorial", 5,
                 widget.log.tutorialCount, true)),
+        SizedBox(width: 5),
         _card(Icons.open_in_new_rounded, "New tab", () {
           WebUtilities.openStringContentInNewPage(
               widget.log.originalLog.data.contents);
@@ -224,41 +225,48 @@ class _LogViewState extends State<LogView> {
         });
       },
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
         height: 80.0,
         width: 100.0,
         decoration: BoxDecoration(
+          border: Border.all(
+              color: selected
+                  ? Color(0xFFC19652)
+                  : Theme.of(context).colorScheme.background,
+              width: selected ? 0.5 : 0.5),
           color: selected
               ? Theme.of(context).colorScheme.secondaryVariant
               : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20.0),
-          boxShadow: [selected ? commonBoxShadow() : slightBoxShadow()],
+          boxShadow: [selected ? heavyBoxShadow() : slightBoxShadow()],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0),
-              child: Text(title, overflow: TextOverflow.fade, maxLines: 1),
-            ),
-            Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 15.0, bottom: 10.0),
-                  child: Text(additionalCountInfo != 0
-                      ? additionalCountInfo.toString()
-                      : ""),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(right: 15.0, bottom: 10.0),
-                  child: Icon(icon),
-                ),
-              ],
-            )
-          ],
+        child: Container(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0),
+                child: Text(title, overflow: TextOverflow.fade, maxLines: 1),
+              ),
+              Spacer(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 15.0, bottom: 10.0),
+                    child: Text(additionalCountInfo != 0
+                        ? additionalCountInfo.toString()
+                        : ""),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(right: 15.0, bottom: 10.0),
+                    child: Icon(icon),
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
