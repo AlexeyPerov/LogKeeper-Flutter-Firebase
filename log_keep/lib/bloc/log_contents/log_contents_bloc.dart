@@ -35,7 +35,7 @@ class LogContentsBloc extends Bloc<LogContentsEvent, LogContentsState> {
     final cheatExp = new RegExp('cheat', caseSensitive: false);
     final tutorialExp = new RegExp('tutorial', caseSensitive: false);
     final modelExp = new RegExp(
-        r'(\[ProfileService\])|(\[Server\])|(Request:)|(Response:)|(Received response)',
+        r'(\[PlayerService\])|(\[Server\])|(Request:)|(Response:)|(Received response)',
         caseSensitive: false);
 
     for (int i = 0; i < linesRaw.length; i++) {
