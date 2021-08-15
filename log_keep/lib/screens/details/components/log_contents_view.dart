@@ -128,7 +128,8 @@ class _LogContentsViewState extends State<LogContentsView> {
         }
 
         var line = lines[index];
-        var canBeFolded = line.contents.length > 512;
+        var canBeFolded = line.contents.length > 512 ||
+            line.contents.split('\n').length >= 10;
         var longLine = canBeFolded;
         var alarm = line.alarm;
 
