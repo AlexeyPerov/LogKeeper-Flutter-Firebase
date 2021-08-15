@@ -1,80 +1,54 @@
-# LogKeeper
+# LogKeeper (Flutter Firebase)
 
-This is a Flutter tool used for easy logs sharing within development and QA teams.
-Supports iOS/Android/Web and  Dart backend API.
+This is a Flutter log snapshot management solution used to save and share log snapshots within the development team.
+Supports iOS/Android/Web and utilizes Dart backend API (with client-server shared code). 
+Logs stored in Firestore and Firebase Auth used to access some parts of the data.
 
-## Usage example
+## Usage
 
-Typical usage:
-* QA engineer or anyone in the team encounters error in the app
-* Whether it is an error popup or just a suspicious behaviour there is a button to call LogKeeper (to upload logs there)
-* This button reads log file and makes POST request. An example below is for C# Unity 
+* QA engineer or someone from the team finds an error in the app
+* Whether it is an error popup or just a suspicious behaviour there should always be a button to upload logs to the LogKeeper
+* This button reads log file and makes POST request which saves the log on the server, analyzes it and returns a link to it
+* Now a person has the link to the uploaded log which they can share to the Bug report or just post it to the chat.\
+The link looks something like: [https://[your_hosting_url]/#/details?id=[log_id]]()  \
+Link redirects to this log like this:\
 
-```csharp
-var form = new WWWForm();
+| Log Contents  | Log Contents in Web view |
+| ------------- | ------------- |
+| ![image](screenshots/screenshot_log.png) | ![image](screenshots/screenshot_log.png)  |
 
-// Prepare log data
-form.AddField("title", title);
-form.AddField("author", author);
-form.AddField("project", project);
-form.AddField("contents", contents); // the log contents
+All logs later can be found on the home screen which is accessible only for authorized users:\
 
-// Send
-var uwr = UnityWebRequest.Post("your_url" + "/save", form);
-yield return uwr.SendWebRequest();
-if (uwr.isNetworkError || uwr.isHttpError)
-{
-    // error
-    return;
-}
-
-// Read result
-var raw = Encoding.UTF8.GetString(uwr.downloadHandler.data);
-var id = JSON.Parse(raw)["body"]["id"].Value;
-var urlFormat = JSON.Parse(raw)["body"]["url_format"].Value;
-
-// Get the link to the log
-var link = string.Format(urlFormat, id);
-_clipboardService.SetText(link);
-ShowNotifications("Report link copied to clipboard");
-```
-
-* Now a person has the link to the uploaded log (this example copies it to clipboard as well)
-* It can be shared to the Bug report or just be posted to the chat.
-Link redirects to this log like this:
-![image](screenshots/screenshot_log.png)
-
-Now your teammates can see this log and it will be kept there like this:
-![image](screenshots/screenshot_main.png)
-
-Yes, there are tons of tools such as Log Stash, Kibana but this one
- - does only one simple common task
- - deployed within seconds and completely free
- - easy to be used by anyone in your team
+| Auth Screen  | Home Screen |
+| ------------- | ------------- |
+| ![image](screenshots/screenshot_main.png) | ![image](screenshots/screenshot_main.png)  |
+| Settings Screen  | Upload Log screen  |
+| ![image](screenshots/screenshot_main.png) | ![image](screenshots/screenshot_main.png)  |
  
 ## Description
 
-It is also an example of using such patterns and tools as:
+This tool uses:
 * [Flutter Bloc](https://pub.dev/packages/flutter_bloc)
-* [Firebase Firestore](https://firebase.google.com/docs/firestore)
-* simple Dart backend (with [shelf](https://pub.dev/packages/shelf) and Firebase)
-* shared Dart code project usage with Docker
+* [Firebase Firestore](https://firebase.google.com/docs/firestore) & [Firestore cache](https://pub.dev/packages/firestore_cache)
+* [Firebase Auth](https://firebase.google.com/docs/auth)
+* Dart backend (with [shelf](https://pub.dev/packages/shelf) and Firebase)
+* shared Dart code project usage with [Docker](https://www.docker.com/)
 * [Firebase Flutter app hosting](https://firebase.google.com/docs/hosting)
+* Conditional rendering with [proviso](https://pub.dev/packages/proviso)
+* Embed [Web browser](https://pub.dev/packages/web_browser)
+* Themes and their dynamic switching, drawer, [fading edge scroll view](https://pub.dev/packages/fading_edge_scrollview),
+ ModelBinding, [Hive](https://pub.dev/packages/hive), streams, service locator [getIt](https://pub.dev/packages/get_it) etc
 
-Contains 3 projects:
-- log_keep
-- log_keep_back
-- log_keep_shared
-
-Backend part log_keep_back provides an API to upload logs and to retrieve links to share them.  
-Client part log_keep is used to view and/or upload logs.
-
-Storage uses Firestore (but anything else can be used too).
+Consists of the following parts:
+- log_keep_back (an API to upload logs and to retrieve links to share them)
+- log_keep (client part to view logs or upload them manually)
+- log_keep_shared (code shared between other two projects)
+- code to send logs to an API from your apps (an example for Unity C# is given below)
 
 Folders structure is based on https://hub.docker.com/r/google/dart-runtime-base
 in order to use shared code in log_keep_shared both on the client and server sides.
 
-## How to setup
+## How to set it up
 
 ### Firebase Account
 
@@ -122,3 +96,50 @@ Instructions on how to build & deploy server can also be found here https://hub.
 * flutter build web 
 * init and login using Firebase CLI 
 * firebase deploy --only hosting
+
+## Notes
+
+### TODO
+* Mock data repository
+* Null safety
+* Get rid of project specific parsing code in some base classes
+
+#### Known issues and limitations
+* The [Web browser](https://pub.dev/packages/web_browser) forces all widgets above it to ignore all clicks on them.
+As a temporary solution in such cases, the browser becomes hidden.
+* Firestore limits its entities to 2mb so this is the limitation for log files uploaded. 
+The plan is to use Firebase Storage to keep logs there.
+* Generally Flutter Web performance in case of rendering text has problems sometimes. That is some this to R&D. For now, in extreme cases, [Web browser](https://pub.dev/packages/web_browser) can be used to view log contents instead. 
+
+### Example code of sending request to the LogKeeper
+
+Unity, C#:
+
+```csharp
+var form = new WWWForm();
+
+// Prepare log data
+form.AddField("title", title);
+form.AddField("author", author);
+form.AddField("project", project);
+form.AddField("contents", contents); // the log contents
+
+// Send
+var uwr = UnityWebRequest.Post("your_url" + "/save", form);
+yield return uwr.SendWebRequest();
+if (uwr.isNetworkError || uwr.isHttpError)
+{
+    // error
+    return;
+}
+
+// Read result
+var raw = Encoding.UTF8.GetString(uwr.downloadHandler.data);
+var id = JSON.Parse(raw)["body"]["id"].Value;
+var urlFormat = JSON.Parse(raw)["body"]["url_format"].Value;
+
+// Get the link to the log
+var link = string.Format(urlFormat, id);
+_clipboardService.SetText(link);
+ShowNotifications("Report link copied to clipboard");
+```
