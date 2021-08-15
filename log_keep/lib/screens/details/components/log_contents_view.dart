@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:log_keep/app/theme/themes.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
+import 'package:log_keep/screens/details/details_screen.dart';
 import 'package:proviso/proviso.dart';
 import 'package:web_browser/web_browser.dart';
 import 'package:universal_html/html.dart' as html;
@@ -138,6 +139,9 @@ class _LogContentsViewState extends State<LogContentsView> {
             : selectableText;
 
         var defaultUnfoldedValue = !longLine || !canBeFolded || alarm;
+        if (limitedView) {
+          defaultUnfoldedValue = false;
+        }
         var unfolded = lineParams[line.index] != null
             ? lineParams[line.index].unfolded
             : defaultUnfoldedValue;
@@ -242,6 +246,11 @@ class _LogContentsViewState extends State<LogContentsView> {
   }
 
   Widget _buildWebRawView() {
+    if (detailsDrawerOpened){
+      // HACK because webView block Drawer ray casts. So we disable webView at that moment
+      return Container();
+    }
+
     final textColor = Theme.of(context).textTheme.bodyText1.color;
     final textRgb =
         'rgb(${textColor.red}, ${textColor.green}, ${textColor.blue})';
@@ -273,6 +282,11 @@ class _LogContentsViewState extends State<LogContentsView> {
   }
 
   Widget _buildWebView(List<LogLine> lines) {
+    if (detailsDrawerOpened){
+      // HACK because webView block Drawer ray casts. So we disable webView at that moment
+      return Container();
+    }
+
     final textColor = Theme.of(context).textTheme.bodyText1.color;
     final textRgb =
         'rgb(${textColor.red}, ${textColor.green}, ${textColor.blue})';

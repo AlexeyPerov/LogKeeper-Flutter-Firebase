@@ -87,7 +87,8 @@ class _LogViewState extends State<LogView> {
                       setState(() {
                         // we need this because webView block all ray casts on top of it
                         _useWebView = false;
-                        widget.settings.putBool("selected_web_view_mode", false);
+                        widget.settings
+                            .putBool("selected_web_view_mode", false);
                       });
                     widget.onDelete();
                   },
@@ -106,7 +107,8 @@ class _LogViewState extends State<LogView> {
               child: Text(
                   dateFormatter.format(widget.log.originalLog.info.createdAt) +
                       ' ' +
-                      timeFormatter.format(widget.log.originalLog.info.createdAt),
+                      timeFormatter
+                          .format(widget.log.originalLog.info.createdAt),
                   style: TextStyle(fontSize: 14)),
             ),
             Padding(
@@ -156,7 +158,15 @@ class _LogViewState extends State<LogView> {
 
     return Row(
       children: [
-        Spacer(),
+        ConditionWidget(
+          condition: limitedView,
+          widget: IconButton(
+            padding: EdgeInsets.zero,
+            onPressed: () => HomeScreenNavigation.navigate(context),
+            icon: Icon(Icons.arrow_back_ios, size: 25),
+          ),
+        ),
+        ConditionWidget(condition: !limitedView, widget: Spacer()),
         _modeCard(Icons.web, "Raw", 0, 0, false),
         ConditionWidget(
             condition: widget.log.alarmsCount > 0,
@@ -187,7 +197,7 @@ class _LogViewState extends State<LogView> {
           }),
         ),
         SizedBox(width: limitedView ? 3 : 25),
-        Spacer(),
+        ConditionWidget(condition: !limitedView, widget: Spacer()),
         IgnorePointer(
           ignoring: _mode == 0,
           child: Column(
@@ -235,6 +245,9 @@ class _LogViewState extends State<LogView> {
 
   Widget _modeCard(IconData icon, String title, int index,
       int additionalCountInfo, bool canUseWebView) {
+    var width = MediaQuery.of(context).size.width;
+    final limitedView = width <= 1024;
+
     var selected = _mode == index;
 
     return GestureDetector(
@@ -245,7 +258,8 @@ class _LogViewState extends State<LogView> {
         });
       },
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        margin: EdgeInsets.symmetric(
+            vertical: limitedView ? 3 : 10, horizontal: limitedView ? 3 : 10),
         height: 80.0,
         width: 100.0,
         decoration: BoxDecoration(

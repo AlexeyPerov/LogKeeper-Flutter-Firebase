@@ -12,22 +12,34 @@ import 'package:log_keep/screens/home/home_screen.dart';
 import 'components/details_drawer.dart';
 import 'components/log_view.dart';
 
-class DetailsScreen extends StatelessWidget {
+bool detailsDrawerOpened = false;
+
+class DetailsScreen extends StatefulWidget {
   final LogDetailsLoadArguments arguments;
 
   DetailsScreen({@required this.arguments});
 
   @override
+  _DetailsScreenState createState() => _DetailsScreenState();
+}
+
+class _DetailsScreenState extends State<DetailsScreen> {
+  @override
   Widget build(BuildContext context) {
     return BlocProvider<LogContentsBloc>(create: (context) {
       return LogContentsBloc(logsRepository: getIt<LogsRepository>())
-        ..add(LoadLogContents(arguments.logId));
+        ..add(LoadLogContents(widget.arguments.logId));
     }, child: BlocBuilder<LogContentsBloc, LogContentsState>(
         builder: (context, LogContentsState state) {
       if (state is LogContentsLoaded) {
         return Scaffold(
             appBar: kIsWeb ? AppBar() : null,
             drawer: DetailsDrawer(log: state.log),
+            onDrawerChanged: (isOpened) {
+              setState(() {
+                detailsDrawerOpened = isOpened;
+              });
+            },
             body: getWidgetForLoadedState(context, state.log));
       } else {
         return Scaffold(

@@ -47,6 +47,8 @@ class SettingsScreen extends StatelessWidget {
 
 Widget drawThemeModeCard(
     BuildContext context, IconData icon, ThemeMode themeMode) {
+  var width = MediaQuery.of(context).size.width;
+  final limitedView = width <= 1024;
   var selected = AppOptions.of(context).themeMode == themeMode;
 
   return GestureDetector(
@@ -58,7 +60,7 @@ Widget drawThemeModeCard(
     child: Container(
       margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       height: 120.0,
-      width: 250.0,
+      width: limitedView ? 100 : 250.0,
       decoration: BoxDecoration(
         color: selected ? kPrimaryColor : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20.0),
