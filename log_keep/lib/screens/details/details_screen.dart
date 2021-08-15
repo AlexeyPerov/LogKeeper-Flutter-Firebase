@@ -40,8 +40,12 @@ class DetailsScreen extends StatelessWidget {
   }
 
   Widget getWidgetForLoadedState(BuildContext context, LogAnalysisEntity log) {
-    if (kIsWeb) {
-      var width = MediaQuery.of(context).size.width;
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+
+    final limitedView = width <= 1024 || height <= 1024;
+
+    if (kIsWeb && !limitedView) {
       var targetWidth = width > 1024 ? min(width - 150, width) : width;
       return Align(
         alignment: Alignment.center,
@@ -55,7 +59,6 @@ class DetailsScreen extends StatelessWidget {
                 settings: getIt<SettingsRepository>())),
       );
     } else {
-      var height = MediaQuery.of(context).size.height;
       return SafeArea(child: new LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
         return Container(

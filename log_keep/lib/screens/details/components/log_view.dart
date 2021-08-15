@@ -42,86 +42,100 @@ class _LogViewState extends State<LogView> {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+
+    final limitedView = width <= 1024 || height <= 1024;
+
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Padding(
         padding: const EdgeInsets.only(left: 10.0),
-        child: Row(children: [
-          IconButton(
-            padding: EdgeInsets.zero,
-            onPressed: () => HomeScreenNavigation.navigate(context),
-            icon: Icon(Icons.arrow_back_ios, size: 25),
-          ),
-          Expanded(
-            child: TextField(
-              readOnly: true,
-              controller: widget.linkController,
+        child: ConditionWidget(
+          condition: !limitedView,
+          widget: Row(children: [
+            IconButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => HomeScreenNavigation.navigate(context),
+              icon: Icon(Icons.arrow_back_ios, size: 25),
             ),
-          ),
-          Padding(
-              padding: const EdgeInsets.only(right: 15.0),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  FlutterClipboard.copy(widget.linkController.text)
-                      .then((result) {
-                    final snackBar =
-                        SnackBar(content: Text('Link copied to clipboard'));
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  });
-                },
-                icon: Icon(Icons.copy, size: 25),
-              )),
-          Padding(
-              padding: const EdgeInsets.only(right: 15.0),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  if (_mode == 0)
-                    setState(() {
-                      // we need this because webView block all ray casts on top of it
-                      _useWebView = false;
-                      widget.settings.putBool("selected_web_view_mode", false);
+            Expanded(
+              child: TextField(
+                readOnly: true,
+                controller: widget.linkController,
+              ),
+            ),
+            Padding(
+                padding: const EdgeInsets.only(right: 15.0),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    FlutterClipboard.copy(widget.linkController.text)
+                        .then((result) {
+                      final snackBar =
+                          SnackBar(content: Text('Link copied to clipboard'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     });
-                  widget.onDelete();
-                },
-                icon: Icon(Icons.delete, size: 25),
-              ))
-        ]),
+                  },
+                  icon: Icon(Icons.copy, size: 25),
+                )),
+            Padding(
+                padding: const EdgeInsets.only(right: 15.0),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    if (_mode == 0)
+                      setState(() {
+                        // we need this because webView block all ray casts on top of it
+                        _useWebView = false;
+                        widget.settings.putBool("selected_web_view_mode", false);
+                      });
+                    widget.onDelete();
+                  },
+                  icon: Icon(Icons.delete, size: 25),
+                ))
+          ]),
+        ),
       ),
-      SizedBox(height: 20),
-      Row(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(left: 10),
-            child: Text(
-                dateFormatter.format(widget.log.originalLog.info.createdAt) +
-                    ' ' +
-                    timeFormatter.format(widget.log.originalLog.info.createdAt),
-                style: TextStyle(fontSize: 14)),
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 10),
-            child: Text(widget.log.originalLog.info.author,
-                style: TextStyle(fontSize: 14)),
-          )
-        ],
-      ),
-      SizedBox(height: 6),
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        child: Scrollbar(
-          child: ConstrainedBox(
-            constraints: new BoxConstraints(
-              minHeight: 10.0,
-              maxHeight: 100.0,
+      SizedBox(height: limitedView ? 6 : 20),
+      ConditionWidget(
+        condition: !limitedView,
+        widget: Row(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: Text(
+                  dateFormatter.format(widget.log.originalLog.info.createdAt) +
+                      ' ' +
+                      timeFormatter.format(widget.log.originalLog.info.createdAt),
+                  style: TextStyle(fontSize: 14)),
             ),
-            child: SelectableText(widget.log.originalLog.info.title,
-                toolbarOptions: commonToolbarOptions(),
-                style: TextStyle(fontSize: 14)),
+            Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: Text(widget.log.originalLog.info.author,
+                  style: TextStyle(fontSize: 14)),
+            )
+          ],
+        ),
+      ),
+      SizedBox(height: limitedView ? 0 : 6),
+      ConditionWidget(
+        condition: !limitedView,
+        widget: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          child: Scrollbar(
+            child: ConstrainedBox(
+              constraints: new BoxConstraints(
+                minHeight: 10.0,
+                maxHeight: 100.0,
+              ),
+              child: SelectableText(widget.log.originalLog.info.title,
+                  toolbarOptions: commonToolbarOptions(),
+                  style: TextStyle(fontSize: 14)),
+            ),
           ),
         ),
       ),
-      _buildModesList(),
+      _buildModesList(limitedView),
       Divider(),
       Expanded(
         child: Padding(
@@ -136,7 +150,10 @@ class _LogViewState extends State<LogView> {
     ]);
   }
 
-  Widget _buildModesList() {
+  Widget _buildModesList(bool limitedView) {
+    var width = MediaQuery.of(context).size.width;
+    final limitedView = width <= 1024;
+
     return Row(
       children: [
         Spacer(),
@@ -150,23 +167,26 @@ class _LogViewState extends State<LogView> {
             widget: _modeCard(
                 Icons.view_headline, "Logs", 1, widget.log.lines.length, true)),
         ConditionWidget(
-            condition: widget.log.modelCount > 0,
+            condition: !limitedView && widget.log.modelCount > 0,
             widget: _modeCard(
                 Icons.view_headline, "Server", 3, widget.log.modelCount, true)),
         ConditionWidget(
-            condition: widget.log.cheatCount > 0,
+            condition: !limitedView && widget.log.cheatCount > 0,
             widget: _modeCard(
                 Icons.view_headline, "Cheat", 4, widget.log.cheatCount, true)),
         ConditionWidget(
-            condition: widget.log.tutorialCount > 0,
+            condition: !limitedView && widget.log.tutorialCount > 0,
             widget: _modeCard(Icons.view_headline, "Tutorial", 5,
                 widget.log.tutorialCount, true)),
-        SizedBox(width: 5),
-        _card(Icons.open_in_new_rounded, "New tab", () {
-          WebUtilities.openStringContentInNewPage(
-              widget.log.originalLog.data.contents);
-        }),
-        SizedBox(width: 25),
+        SizedBox(width: limitedView ? 3 : 5),
+        ConditionWidget(
+          condition: width > 700,
+          widget: _card(Icons.open_in_new_rounded, "New tab", () {
+            WebUtilities.openStringContentInNewPage(
+                widget.log.originalLog.data.contents);
+          }),
+        ),
+        SizedBox(width: limitedView ? 3 : 25),
         Spacer(),
         IgnorePointer(
           ignoring: _mode == 0,

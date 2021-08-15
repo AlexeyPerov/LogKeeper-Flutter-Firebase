@@ -115,6 +115,9 @@ class _LogContentsViewState extends State<LogContentsView> {
       Map<int, _LineOptions> lineParams,
       bool selectableText,
       bool showAlarmIcons}) {
+    var width = MediaQuery.of(context).size.width;
+    final limitedView = width <= 1024;
+
     return ListView.builder(
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
@@ -183,7 +186,10 @@ class _LogContentsViewState extends State<LogContentsView> {
                   padding: const EdgeInsets.only(top: 4, left: 3),
                   child: Text(line.index.toString(), style: _logIndexTextStyle),
                 ),
-                _drawFoldWidgets(line, canBeFolded, unfolded, lineParams),
+                ConditionWidget(
+                    condition: !limitedView,
+                    widget: _drawFoldWidgets(
+                        line, canBeFolded, unfolded, lineParams)),
                 IconButton(
                     icon: Icon(Icons.copy),
                     color: Colors.grey,
