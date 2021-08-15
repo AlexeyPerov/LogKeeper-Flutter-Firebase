@@ -50,7 +50,7 @@ class AppWidget extends StatelessWidget {
   MaterialApp _createApp(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Log Keeper',
+      title: 'Logs',
       themeMode: AppOptions.of(context).themeMode,
       theme: AppThemeData.lightThemeData.copyWith(
         platform: AppOptions.of(context).platform,
