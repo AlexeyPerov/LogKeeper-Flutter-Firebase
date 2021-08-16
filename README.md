@@ -4,7 +4,9 @@ This is a Flutter log snapshot management solution used to save and share log sn
 Supports iOS/Android/Web and utilizes Dart backend API (with client-server shared code). 
 Logs stored in Firestore and Firebase Auth used to access some parts of the data.
 
-## Usage
+By default, mock repositories are used. So just run the project to try it with mock data. 
+
+## Usage scenario
 
 * QA engineer or someone from the team finds an error in the app
 * Whether it is an error popup or just a suspicious behaviour there should always be a button to upload logs to the LogKeeper
@@ -26,7 +28,7 @@ All logs later can be found on the home screen which is accessible only for auth
 | ![image](screenshots/settings_screen_dark.png) | ![image](screenshots/upload_log_screen_dark.png)  | ![image](screenshots/home_screen_drawer_dark.png) |
 
  
-## Description
+## Structure
 
 This tool uses:
 * [Flutter Bloc](https://pub.dev/packages/flutter_bloc)
@@ -76,6 +78,22 @@ var firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+```
+
+### Moving from mock to Firebase data
+
+Mock repositories used by default. When your Firebase account is ready please go to [app.dart](./log_keep/lib/app/app.dart) and uncomment Firebase repositories
+
+```dart
+firebaseApp = await Firebase.initializeApp();
+
+getIt.registerSingleton<AuthRepository>(
+    FirebaseAuthRepository(),
+    signalsReady: true);
+
+getIt.registerSingleton<LogsRepository>(
+    FirestoreLogsRepository(FirebaseFirestore.instance),
+    signalsReady: true);
 ```
 
 ### Google Service Account
