@@ -7,6 +7,8 @@ import 'package:get_it/get_it.dart';
 import 'package:log_keep/bloc/loggable_bloc_observer.dart';
 import 'package:log_keep/repositories/auth_repository.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
+import 'package:log_keep/repositories/mock/mock_auth_repository.dart';
+import 'package:log_keep/repositories/mock/mock_logs_repository.dart';
 import 'package:logger/logger.dart';
 
 GetIt getIt = GetIt.instance;
@@ -24,6 +26,16 @@ class App {
       Bloc.observer = LoggableBlocObserver();
     }
 
+    getIt.registerSingleton<AuthRepository>(
+        MockAuthRepository(),
+        signalsReady: true);
+
+    getIt.registerSingleton<LogsRepository>(
+        MockLogsRepository(),
+        signalsReady: true);
+
+    // TODO uncomment this when your Firebase account is ready
+    /*
     firebaseApp = await Firebase.initializeApp();
 
     getIt.registerSingleton<AuthRepository>(
@@ -33,7 +45,9 @@ class App {
     getIt.registerSingleton<LogsRepository>(
         FirestoreLogsRepository(FirebaseFirestore.instance),
         signalsReady: true);
+    */
 
+    getIt<AuthRepository>().initialize();
     getIt<LogsRepository>().initialize();
   }
 

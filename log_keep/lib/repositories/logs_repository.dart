@@ -15,6 +15,7 @@ abstract class LogsRepository {
   Stream<List<String>> getProjects();
   Stream<int> getLogsCountByProject(String project);
   Future<void> archiveProject(String project);
+  String getProjectId();
 }
 
 class FirestoreLogsRepository extends LogsRepository {
@@ -200,6 +201,11 @@ class FirestoreLogsRepository extends LogsRepository {
     }
 
     return result;
+  }
+
+  @override
+  String getProjectId() {
+    return firebaseApp.options.projectId;
   }
 }
 
