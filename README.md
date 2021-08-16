@@ -96,7 +96,13 @@ getIt.registerSingleton<LogsRepository>(
     signalsReady: true);
 ```
 
-### Google Service Account
+## To build and host Web client use
+* cd log_keep
+* flutter build web 
+* init and login using Firebase CLI 
+* firebase deploy --only hosting
+
+## Google Service Account
 
 For a backend to run you need a Google Service Account https://cloud.google.com/iam/docs/service-accounts. 
 
@@ -110,25 +116,20 @@ Service account credentials could be passed to log_keep_back via .env file:
 
 Instructions on how to build & deploy server can also be found here https://hub.docker.com/r/google/dart-runtime-base
 
-## To build and host Web client use
-* cd log_keep
-* flutter build web 
-* init and login using Firebase CLI 
-* firebase deploy --only hosting
-
 ## Notes
 
 ### TODO
-* Mock data repository
 * Null safety
-* Get rid of project specific parsing code in some base classes
+* Get rid of project specific parsing code in some base classes. 
+It is located in [log_contents_bloc.dart](./log_keep/lib/bloc/log_contents/log_contents_bloc.dart). 
+See [mock_logs_repositories.dart](./log_keep/lib/repositories/mock/mock_logs_repositories.dart) for the example of log it expects.
 
 #### Known issues and limitations
 * The [Web browser](https://pub.dev/packages/web_browser) forces all widgets above it to ignore all clicks on them.
 As a temporary solution in such cases, the browser becomes hidden.
 * Firestore limits its entities to 2mb so this is the limitation for log files uploaded. 
 The plan is to use Firebase Storage to keep logs there.
-* Generally Flutter Web performance in case of rendering text has problems sometimes. That is some this to R&D. For now, in extreme cases, [Web browser](https://pub.dev/packages/web_browser) can be used to view log contents instead. 
+* Flutter Web text rendering performance seems to have some issues. This is a target for some R&D. For now [Web browser](https://pub.dev/packages/web_browser) has been added as a fallback log viewer. 
 
 ### Example code of sending request to the LogKeeper
 
