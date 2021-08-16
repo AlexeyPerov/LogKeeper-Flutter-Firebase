@@ -15,15 +15,16 @@ Link redirects to this log like this:\
 
 | Log Contents  | Log Contents in Web view |
 | ------------- | ------------- |
-| ![image](screenshots/screenshot_log.png) | ![image](screenshots/screenshot_log.png)  |
+| ![image](screenshots/log_screen_dark_3.png) | ![image](screenshots/log_screen_raw_light.png)  |
 
-All logs later can be found on the home screen which is accessible only for authorized users:\
+All logs later can be found on the home screen which is accessible only for authorized users\
 
-| Auth Screen  | Home Screen |
-| ------------- | ------------- |
-| ![image](screenshots/screenshot_main.png) | ![image](screenshots/screenshot_main.png)  |
-| Settings Screen  | Upload Log screen  |
-| ![image](screenshots/screenshot_main.png) | ![image](screenshots/screenshot_main.png)  |
+| Auth Screen  | Home Screen | Log Deletion Popup |
+| ------------- | ------------- | ------------- |
+| ![image](screenshots/auth_screen_dark.png) | ![image](screenshots/home_screen_dark_2.png)  | ![image](screenshots/log_deletion_popup_light_2.png)  |
+| Settings Screen  | Upload Log Screen  | Home Screen Drawer |
+| ![image](screenshots/settings_screen_dark.png) | ![image](screenshots/upload_log_screen_dark.png)  | ![image](screenshots/home_screen_drawer_dark.png) |
+
  
 ## Description
 
@@ -36,7 +37,7 @@ This tool uses:
 * [Firebase Flutter app hosting](https://firebase.google.com/docs/hosting)
 * Conditional rendering with [proviso](https://pub.dev/packages/proviso)
 * Embed [Web browser](https://pub.dev/packages/web_browser)
-* Themes and their dynamic switching, drawer, [fading edge scroll view](https://pub.dev/packages/fading_edge_scrollview),
+* Themes and their dynamic switching, drawer, popups, [fading edge scroll view](https://pub.dev/packages/fading_edge_scrollview),
  ModelBinding, [Hive](https://pub.dev/packages/hive), streams, service locator [getIt](https://pub.dev/packages/get_it) etc
 
 Consists of the following parts:
