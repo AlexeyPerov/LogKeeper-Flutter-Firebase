@@ -163,3 +163,8 @@ var link = string.Format(urlFormat, id);
 _clipboardService.SetText(link);
 ShowNotifications("Report link copied to clipboard");
 ```
+
+## Contributions
+
+Feel free to [report bugs, request new features](https://github.com/AlexeyPerov/LogKeeper-Flutter-Firebase/issues) 
+or to [contribute](https://github.com/AlexeyPerov/LogKeeper-Flutter-Firebase/pulls) to this project! 
