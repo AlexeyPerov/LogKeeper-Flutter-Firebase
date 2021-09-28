@@ -1,6 +1,6 @@
-# LogKeeper (Flutter Firebase)
+# LogKeeper (Flutter & Firebase)
 
-This is a Flutter log snapshot management solution used to save and share log snapshots within the development team.
+This is a log snapshot management solution used to save and share log snapshots within the development team.
 Supports iOS/Android/Web and utilizes Dart backend API (with client-server shared code). 
 Logs stored in Firestore and Firebase Auth used to access some parts of the data.
 
