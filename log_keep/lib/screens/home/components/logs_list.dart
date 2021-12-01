@@ -12,7 +12,7 @@ import 'package:log_keep/common/utilities/web_utilities.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/screens/details/details_screen.dart';
 import 'package:log_keep/screens/details/services/log_deletion_service.dart';
-import 'package:log_keep/screens/details/services/project_archiving_service.dart';
+import 'package:log_keep/screens/home/services/project_archiving_service.dart';
 import 'package:log_keep_shared/log_keep_shared.dart';
 import 'package:log_keep/common/utilities/string_extensions.dart';
 import 'package:proviso/proviso.dart';
