@@ -1,0 +1,22 @@
+service: node-serverless-app
+
+custom:
+  secrets: ${file(serviceAccountKey.json)}
+
+provider: 
+  name: aws 
+  runtime: nodejs10.x
+  stage: ${env:STAGE}
+  region: eu-central-1 
+
+functions: 
+  app: 
+    handler: app.handler 
+    events:
+      - http: 
+          path: /logkeeper/unfurl 
+          method: get
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
