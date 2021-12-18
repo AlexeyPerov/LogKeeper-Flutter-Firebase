@@ -1,11 +1,13 @@
-service: node-serverless-app
+service: node-keeper-unfurl-serverless-app
 
 custom:
   secrets: ${file(serviceAccountKey.json)}
 
 provider: 
-  name: aws 
-  runtime: nodejs10.x
+  name: aws
+  stackName: kometa-keeper-unfurl-stack
+  apiName: kometa-keeper-unfurl-api
+  runtime: nodejs14.x
   stage: ${env:STAGE}
   region: eu-central-1 
 

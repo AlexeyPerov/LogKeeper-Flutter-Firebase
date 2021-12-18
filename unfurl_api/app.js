@@ -26,7 +26,7 @@ app.get('/logkeeper/unfurl', async (req, res) => {
         res.status(200).send(result);
     } catch (e) {
         console.log(e);
-        res.status(501).send();
+        res.status(404).send();
     }
 });
 
