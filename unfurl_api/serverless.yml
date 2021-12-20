@@ -2,6 +2,7 @@ service: node-keeper-unfurl-serverless-app
 
 custom:
   secrets: ${file(serviceAccountKey.json)}
+  slack_enable_logging: true
 
 provider: 
   name: aws
@@ -9,14 +10,22 @@ provider:
   apiName: kometa-keeper-unfurl-api
   runtime: nodejs14.x
   stage: ${env:STAGE}
-  region: eu-central-1 
+  region: eu-central-1
+  memorySize: 512
+  timeout: 4
+  environment:
+    SLACK_VERIFICATION_TOKEN: ${env:SLACK_VERIFICATION_TOKEN}
+    SLACK_CLIENT_TOKEN: ${env:SLACK_CLIENT_TOKEN}
 
 functions: 
   app: 
     handler: app.handler 
     events:
+      - http:
+          path: /logkeeper-app-unfurl
+          method: post
       - http: 
-          path: /logkeeper/unfurl 
+          path: /logkeeper/unfurl
           method: get
 
 plugins:
