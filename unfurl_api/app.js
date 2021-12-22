@@ -6,7 +6,6 @@ const { WebClient } = require('@slack/client');
 const keyBy = require('lodash.keyby');
 const omit = require('lodash.omit');
 const mapValues = require('lodash.mapvalues');
-const fetch = require('node-fetch');
 
 const token = process.env.SLACK_VERIFICATION_TOKEN,
     accessToken = process.env.SLACK_CLIENT_TOKEN;
@@ -149,7 +148,7 @@ function messageUnfurlFromLink(link) {
                         accessory: {
                             type: "image",
                             image_url: "https://api.slack.com/img/blocks/bkb_template_images/approvalsNewDevice.png",
-                            alt_tex: "Log"
+                            alt_text: "Log"
                         }
                     }
                 ],
@@ -210,8 +209,13 @@ async function unfurlLogKeeperLink(link) {
     throw 'Unable to find log info';
 }
 
+let firebaseApp = null;
+
 function connectFirebase() {
-    admin.initializeApp({
+    if (firebaseApp)
+        return;
+
+    firebaseApp = admin.initializeApp({
         credential: admin.credential.cert(serviceAccount)
     });
 
