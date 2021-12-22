@@ -168,3 +168,10 @@ ShowNotifications("Report link copied to clipboard");
 
 Feel free to [report bugs, request new features](https://github.com/AlexeyPerov/LogKeeper-Flutter-Firebase/issues) 
 or to [contribute](https://github.com/AlexeyPerov/LogKeeper-Flutter-Firebase/pulls) to this project! 
+
+## Bonus
+
+See folder unfurl_api [unfurl_api](./unfurl_api) for a Slack App which unfurls LogKeeper links like that:
+![image](screenshots/unfurl.png)
+
+Setup instructions are similar to [Monday Unfurl App](https://github.com/AlexeyPerov/monday_slack_unfurl)
