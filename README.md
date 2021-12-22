@@ -171,7 +171,7 @@ or to [contribute](https://github.com/AlexeyPerov/LogKeeper-Flutter-Firebase/pul
 
 ## Bonus
 
-See folder unfurl_api [unfurl_api](./unfurl_api) for a Slack App which unfurls LogKeeper links like that:
+See folder [unfurl_api](./unfurl_api) for a Slack App which unfurls LogKeeper links like that:
 ![image](screenshots/unfurl.png)
 
 Setup instructions are similar to [Monday Unfurl App](https://github.com/AlexeyPerov/monday_slack_unfurl)
