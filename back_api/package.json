@@ -1,0 +1,32 @@
+{
+  "name": "logkeeper_back_app",
+  "version": "1.0.0",
+  "description": "LogKeeper Save API",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "es6-promisify": "^7.0.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "firebase-admin": "^10.0.0",
+    "multer": "^1.4.3",
+    "serverless-http": "^2.7.0",
+    "serverless-offline": "^8.3.1"
+  },
+  "devDependencies": {
+    "serverless-dotenv-plugin": "^3.10.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexeyPerov/LogKeeper-Flutter-Firebase.git"
+  },
+  "author": "AlexeyPerov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AlexeyPerov/LogKeeper-Flutter-Firebase/issues"
+  },
+  "homepage": "https://github.com/AlexeyPerov/LogKeeper-Flutter-Firebase#readme"
+}
