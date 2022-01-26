@@ -8,8 +8,6 @@ const urlFormat = process.env.URL_FORMAT;
 const admin = require('firebase-admin');
 const serviceAccount = require('./serviceAccountKey.json');
 
-const sls = require('serverless-http');
-
 const express = require('express');
 const app = express();
 
@@ -146,4 +144,6 @@ function replaceAll(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
 }
 
-module.exports.handler = sls(app);
+app.listen(3000, function () {
+    console.log('App listening');
+  });
