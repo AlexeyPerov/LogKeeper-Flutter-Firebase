@@ -15,10 +15,10 @@ const multer = require('multer');
 const upload = multer();
 
 // for parsing application/json
-app.use(express.json());
+app.use(express.json({limit: '10mb'}));
 
 // for parsing application/x-www-form-urlencoded
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({extended: true, limit: '10mb'}));
 
 // for parsing multipart/form-data
 app.use(upload.array());
