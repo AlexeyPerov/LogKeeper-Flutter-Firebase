@@ -116,6 +116,61 @@ Service account credentials could be passed to log_keep_back via .env file:
 
 Instructions on how to build & deploy server can also be found here https://hub.docker.com/r/google/dart-runtime-base
 
+## Backend Setup
+
+Backend has one API method - saving log and generating the link for its retrieval.
+
+There are two versions of backend: dart & js (express).
+
+Here are instructions for js version & AWS Lightsail:
+
+* Create an instance of type Linux/Unix + Node (the cheapest one is fine)
+* Connect to the instance
+* Then run
+
+```shell script
+cd stack
+sudo mkdir apps
+sudo mkdir keeper
+sudo mkdir /opt/bitnami/apps/keeper/conf
+sudo mkdir /opt/bitnami/apps/keeper/htdocs
+
+sudo nano /opt/bitnami/apps/keeper/conf/httpd-prefix.conf
+```
+add: Include "/opt/bitnami/apps/keeper/conf/httpd-app.conf"
+
+```shell script
+sudo nano /opt/bitnami/apps/keeper/conf/httpd-app.conf
+```
+
+add:
+
+ProxyPass / http://127.0.0.1:3000/
+
+ProxyPassReverse / http://127.0.0.1:3000/
+
+```shell script
+sudo nano /opt/bitnami/apache2/conf/bitnami/bitnami-apps-prefix.conf
+```
+
+add: Include "/opt/bitnami/apps/keeper/conf/httpd-prefix.conf"
+
+* zip, upload and unzip back_api to keeper (see instructions [here](https://pookidevs.com/how-to-deploy-a-node-js-application-on-aws-lightsail/))
+(to add write permissions use: chmod ugo+rwx keeper)
+
+* then in keeper folder run
+
+```shell script
+sudo /opt/bitnami/ctlscript.sh restart apache
+npm install
+```
+
+To run server as a service use forever
+* sudo npm install -g forever
+* forever start app.js
+
+Don't forget to attach static IP to your new instance.
+
 ## Notes
 
 ### TODO
@@ -139,6 +194,7 @@ Unity, C#:
 var form = new WWWForm();
 
 // Prepare log data
+form.AddField("token", token);
 form.AddField("title", title);
 form.AddField("author", author);
 form.AddField("project", project);
@@ -169,7 +225,7 @@ ShowNotifications("Report link copied to clipboard");
 Feel free to [report bugs, request new features](https://github.com/AlexeyPerov/LogKeeper-Flutter-Firebase/issues) 
 or to [contribute](https://github.com/AlexeyPerov/LogKeeper-Flutter-Firebase/pulls) to this project! 
 
-## Bonus
+## Slack links unfurling
 
 See folder [unfurl_api](./unfurl_api) for a Slack App which unfurls LogKeeper links like that:
 ![image](screenshots/unfurl.png)
