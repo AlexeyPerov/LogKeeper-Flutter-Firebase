@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 abstract class AuthRepository {
-  Future initialize();
+  Future<void> initialize();
   bool isRequired();
   bool isLoggedIn();
   String loggedInEmail();
@@ -16,26 +15,28 @@ abstract class AuthRepository {
 
 class FirebaseAuthRepository extends AuthRepository {
   @override
-  Future initialize() {
+  Future<void> initialize() {
     return Future.value();
   }
 
+  @override
   bool isRequired() {
     return kReleaseMode;
   }
 
+  @override
   bool isLoggedIn() {
     final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
     return firebaseAuth.currentUser != null;
   }
 
+  @override
   String loggedInEmail() {
     final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-    return firebaseAuth.currentUser != null
-        ? firebaseAuth.currentUser.email
-        : "";
+    return firebaseAuth.currentUser?.email ?? '';
   }
 
+  @override
   Future<void> logout() {
     final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
     return firebaseAuth.signOut();
@@ -46,36 +47,38 @@ class FirebaseAuthRepository extends AuthRepository {
       String login, String password) async {
     final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
-    UserCredential userCredential;
-
     try {
-      userCredential =
-      await firebaseAuth.signInWithEmailAndPassword(
+      final userCredential =
+          await firebaseAuth.signInWithEmailAndPassword(
         email: login,
         password: password,
       );
 
-      return Left<AppUser, Exception>(_userFromFirebase(userCredential.user));
-    } catch(e) {
-      return Right<AppUser, Exception>(e);
+      final user = userCredential.user;
+      if (user == null) {
+        return Right(Exception('No user returned'));
+      }
+      return Left<AppUser, Exception>(_userFromFirebase(user));
+    } catch (e) {
+      return Right<AppUser, Exception>(
+          e is Exception ? e : Exception(e.toString()));
     }
   }
 
   AppUser _userFromFirebase(User user) {
-    if (user == null) {
-      return null;
-    }
     return AppUser(
-        uid: user.uid, email: user.email, displayName: user.displayName);
+        uid: user.uid,
+        email: user.email ?? '',
+        displayName: user.displayName ?? '');
   }
 }
 
 @immutable
 class AppUser {
   const AppUser({
-    @required this.uid,
-    this.email,
-    this.displayName,
+    required this.uid,
+    required this.email,
+    required this.displayName,
   });
 
   final String uid;

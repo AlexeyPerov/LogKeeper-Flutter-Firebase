@@ -8,7 +8,8 @@ import 'components/add_log_form.dart';
 class AddLogScreen extends StatelessWidget {
   final AddLogFormParameters logForm;
 
-  AddLogScreen({this.logForm});
+  AddLogScreen({super.key, AddLogFormParameters? logForm})
+      : logForm = logForm ?? AddLogFormParameters();
 
   @override
   Widget build(BuildContext context) {

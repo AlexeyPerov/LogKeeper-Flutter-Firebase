@@ -31,10 +31,10 @@ class SettingsScreen extends StatelessWidget {
           TextButton(
               child: Text(
                 "Back To Home".toUpperCase(),
-                style: Theme.of(context)
-                    .textTheme
-                    .headline6
-                    .copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ) ??
+                    const TextStyle(fontWeight: FontWeight.bold),
               ),
               onPressed: () {
                 HomeScreenNavigation.navigate(context);

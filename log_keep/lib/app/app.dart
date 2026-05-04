@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,13 +10,15 @@ import 'package:log_keep/repositories/mock/mock_auth_repository.dart';
 import 'package:log_keep/repositories/mock/mock_logs_repository.dart';
 import 'package:logger/logger.dart';
 
-GetIt getIt = GetIt.instance;
-FirebaseApp firebaseApp;
+final GetIt getIt = GetIt.instance;
 
-Logger logger;
+/// Set when Firebase-backed repositories are enabled.
+FirebaseApp? firebaseApp;
+
+late Logger logger;
 
 class App {
-  static Future initializeApp() async {
+  static Future<void> initializeApp() async {
     WidgetsFlutterBinding.ensureInitialized();
 
     initializeLogging();
@@ -27,12 +28,14 @@ class App {
     }
 
     getIt.registerSingleton<AuthRepository>(
-        MockAuthRepository(),
-        signalsReady: true);
+      MockAuthRepository(),
+      signalsReady: true,
+    );
 
     getIt.registerSingleton<LogsRepository>(
-        MockLogsRepository(),
-        signalsReady: true);
+      MockLogsRepository(),
+      signalsReady: true,
+    );
 
     // TODO uncomment this when your Firebase account is ready
     /*
@@ -55,12 +58,12 @@ class App {
     logger = Logger(
       filter: CommonLogFilter(),
       printer: PrettyPrinter(
-          methodCount: 2,
-          errorMethodCount: 8,
-          lineLength: 120,
-          colors: true,
-          printEmojis: true,
-          printTime: false
+        methodCount: 2,
+        errorMethodCount: 8,
+        lineLength: 120,
+        colors: true,
+        printEmojis: true,
+        dateTimeFormat: DateTimeFormat.none,
       ),
     );
   }

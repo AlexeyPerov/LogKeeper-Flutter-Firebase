@@ -11,7 +11,7 @@ class MockAuthRepository extends AuthRepository {
   bool _loggedIn = true;
 
   @override
-  Future initialize() {
+  Future<void> initialize() {
     getIt<SettingsRepository>().putString("last_login_name", "JustPressLogin");
     return Future.value();
   }

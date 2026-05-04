@@ -3,7 +3,7 @@ import 'package:log_keep/app/app.dart';
 
 class LoggableBlocObserver extends BlocObserver {
   @override
-  void onEvent(Bloc bloc, Object event) {
+  void onEvent(Bloc bloc, Object? event) {
     logger.i(event);
     super.onEvent(bloc, event);
   }

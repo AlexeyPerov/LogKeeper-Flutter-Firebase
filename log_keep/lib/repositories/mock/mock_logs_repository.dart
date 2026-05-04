@@ -58,13 +58,13 @@ class MockLogsRepository extends LogsRepository {
   }
 
   @override
-  Future<LogEntity> getLogInProjectById(String project, String id) async {
+  Future<LogEntity?> getLogInProjectById(String project, String id) async {
     await fakeDelay();
     return _createMockLogEntity();
   }
 
   @override
-  Future<LogEntity> getLogById(String id) async {
+  Future<LogEntity?> getLogById(String id) async {
     await fakeDelay();
     return _createMockLogEntity();
   }

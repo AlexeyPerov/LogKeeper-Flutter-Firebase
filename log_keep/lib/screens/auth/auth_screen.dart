@@ -1,12 +1,12 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:log_keep/app/app.dart';
+import 'package:log_keep/common/widgets/condition_widget.dart';
 import 'package:log_keep/repositories/auth_repository.dart';
 import 'package:log_keep/repositories/settings_repository.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
-import 'package:proviso/proviso.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -14,8 +14,8 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  TextEditingController _loginController;
-  TextEditingController _passwordController;
+  late final TextEditingController _loginController;
+  late final TextEditingController _passwordController;
   bool _loginButtonEnabled = false;
 
   @override
@@ -23,9 +23,16 @@ class _AuthScreenState extends State<AuthScreen> {
     super.initState();
     _loginController = TextEditingController();
     _loginController.text =
-        getIt<SettingsRepository>().getString("last_login_name");
+        getIt<SettingsRepository>().getString('last_login_name');
     _loginButtonEnabled = _loginController.text.isNotEmpty;
     _passwordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _loginController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -39,7 +46,7 @@ class _AuthScreenState extends State<AuthScreen> {
       children: <Widget>[
         Align(
           alignment: Alignment.center,
-          child: new LayoutBuilder(
+          child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
             var height = MediaQuery.of(context).size.height;
             return Container(
@@ -62,10 +69,10 @@ class _AuthScreenState extends State<AuthScreen> {
                       obscureText: false,
                       textAlign: TextAlign.center,
                       controller: _loginController,
-                      onChanged: (v) => {
+                      onChanged: (v) {
                         setState(() {
                           _loginButtonEnabled = v.isNotEmpty && v.length >= 3;
-                        })
+                        });
                       },
                     ),
                     SizedBox(height: 10),
@@ -98,7 +105,7 @@ class _AuthScreenState extends State<AuthScreen> {
       BuildContext context, TextTheme textTheme, ColorScheme colorScheme) {
     return IconButton(
       icon: const Icon(Icons.login),
-      tooltip: "Login",
+      tooltip: 'Login',
       onPressed: () =>
           {_login(_loginController.text, _passwordController.text)},
     );
@@ -117,7 +124,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   void _navigateToDashboard(BuildContext context) {
     getIt<SettingsRepository>()
-        .putString("last_login_name", _loginController.text);
+        .putString('last_login_name', _loginController.text);
     HomeScreenNavigation.navigate(context);
   }
 }

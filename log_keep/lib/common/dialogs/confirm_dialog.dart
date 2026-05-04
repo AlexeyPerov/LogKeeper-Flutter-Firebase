@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -17,7 +16,7 @@ class ConfirmDialogParams {
 
 Future<void> showConfirmDialog(
     BuildContext context, ConfirmDialogParams arguments) async {
-  return Alert(
+  await Alert(
     context: context,
     type: AlertType.none,
     title: arguments.title,

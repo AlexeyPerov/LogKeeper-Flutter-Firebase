@@ -16,25 +16,26 @@ import 'app/options/app_options.dart';
 import 'app/theme/theme_constants.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   getIt.registerSingleton<EventsStream>(CommonEventsStream());
   getIt.registerSingleton<SettingsRepository>(HiveSettingsRepository());
 
   await getIt.get<SettingsRepository>().initialize();
 
-  runApp(AppWidget());
+  runApp(const AppWidget());
 }
 
 class AppWidget extends StatelessWidget {
-  final Future _appInitialization;
+  const AppWidget({super.key});
 
-  AppWidget() : _appInitialization = App.initializeApp();
+  static final Future<void> _appInitialization = App.initializeApp();
 
   @override
   Widget build(BuildContext context) => ModelBinding(
         initialModel: AppOptions(
           themeMode: ThemeMode.values[getIt
               .get<SettingsRepository>()
-              .getInt("theme_mode", defaultValue: ThemeMode.system.index)],
+              .getInt('theme_mode', defaultValue: ThemeMode.system.index)],
           textScaleFactor: systemTextScaleFactorOption,
           timeDilation: timeDilation,
           platform: defaultTargetPlatform,
@@ -62,31 +63,32 @@ class AppWidget extends StatelessWidget {
     );
   }
 
-  FutureBuilder _redirectOnAppInit(RouteToWidget routeTo) {
-    return FutureBuilder(
+  Widget _redirectOnAppInit(RouteToWidget routeTo) {
+    return FutureBuilder<void>(
       future: _appInitialization,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return ErrorScreen();
+          return const ErrorScreen();
         }
 
         if (snapshot.connectionState == ConnectionState.done) {
           return routeTo();
         }
 
-        return SplashScreen();
+        return const SplashScreen();
       },
     );
   }
 
   Route<dynamic> _generateRoute(RouteSettings settings) {
-    var routingData = settings.name.getRoutingData;
+    final name = settings.name ?? '/';
+    var routingData = name.getRoutingData;
     switch (routingData.route) {
       case '/details':
         return MaterialPageRoute(
             builder: (context) => _redirectOnAppInit(() => DetailsScreen(
-                arguments: LogDetailsLoadArguments(logId: routingData['id']))));
-        break;
+                arguments: LogDetailsLoadArguments(
+                    logId: routingData['id'] ?? ''))));
     }
     final authRepository = getIt<AuthRepository>();
     if (authRepository.isLoggedIn() || !authRepository.isRequired()) {
@@ -101,4 +103,4 @@ class AppWidget extends StatelessWidget {
   }
 }
 
-typedef Widget RouteToWidget();
+typedef RouteToWidget = Widget Function();

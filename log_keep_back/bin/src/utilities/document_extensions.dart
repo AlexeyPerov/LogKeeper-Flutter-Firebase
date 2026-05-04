@@ -2,17 +2,11 @@ import 'package:googleapis/firestore/v1.dart';
 
 extension DocumentExtensions on Document {
   String getId() {
-    if (this == null) {
-      return null;
+    final n = name;
+    if (n == null || n.isEmpty) {
+      return '';
     }
-
-    String id = "";
-
-    if (this.name.isNotEmpty) {
-      var parts = this.name.split('/');
-      id = parts.isNotEmpty ? parts.last : "";
-    }
-
-    return id;
+    final parts = n.split('/');
+    return parts.isNotEmpty ? parts.last : '';
   }
 }

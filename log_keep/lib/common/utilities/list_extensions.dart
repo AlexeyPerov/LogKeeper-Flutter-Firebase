@@ -1,13 +1,8 @@
-extension ListExtension<K> on List<K> {
-  K getValueOrDefault(int index, K defaultValue) {
-    if (this == null) {
-      return defaultValue;
+extension ListExtension<T> on List<T> {
+  T? getValueOrNull(int index) {
+    if (index < 0 || index >= length) {
+      return null;
     }
-
-    if (index < 0 || index >= this.length) {
-      return defaultValue;
-    }
-
     return this[index];
   }
 }

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
@@ -8,12 +7,12 @@ import 'package:log_keep/app/theme/theme_constants.dart';
 
 class AppOptions {
   const AppOptions({
-    this.themeMode,
-    double textScaleFactor,
-    this.timeDilation,
-    this.platform,
-    this.isTestMode,
-  })  : _textScaleFactor = textScaleFactor;
+    this.themeMode = ThemeMode.system,
+    double textScaleFactor = systemTextScaleFactorOption,
+    this.timeDilation = 1.0,
+    this.platform = TargetPlatform.android,
+    this.isTestMode = false,
+  }) : _textScaleFactor = textScaleFactor;
 
   final ThemeMode themeMode;
   final double _textScaleFactor;
@@ -25,14 +24,14 @@ class AppOptions {
     if (_textScaleFactor == systemTextScaleFactorOption) {
       return useSentinel
           ? systemTextScaleFactorOption
-          : MediaQuery.of(context).textScaleFactor;
+          : MediaQuery.textScalerOf(context).scale(1.0);
     } else {
       return _textScaleFactor;
     }
   }
 
   SystemUiOverlayStyle resolvedSystemUiOverlayStyle() {
-    Brightness brightness;
+    final Brightness brightness;
     switch (themeMode) {
       case ThemeMode.light:
         brightness = Brightness.light;
@@ -41,7 +40,8 @@ class AppOptions {
         brightness = Brightness.dark;
         break;
       default:
-        brightness = WidgetsBinding.instance.window.platformBrightness;
+        brightness =
+            WidgetsBinding.instance.platformDispatcher.platformBrightness;
     }
 
     final overlayStyle = brightness == Brightness.dark
@@ -52,12 +52,12 @@ class AppOptions {
   }
 
   AppOptions copyWith({
-    ThemeMode themeMode,
-    double textScaleFactor,
-    Locale locale,
-    double timeDilation,
-    TargetPlatform platform,
-    bool isTestMode,
+    ThemeMode? themeMode,
+    double? textScaleFactor,
+    Locale? locale,
+    double? timeDilation,
+    TargetPlatform? platform,
+    bool? isTestMode,
   }) {
     return AppOptions(
       themeMode: themeMode ?? this.themeMode,
@@ -71,36 +71,38 @@ class AppOptions {
   @override
   bool operator ==(Object other) =>
       other is AppOptions &&
-          themeMode == other.themeMode &&
-          _textScaleFactor == other._textScaleFactor &&
-          timeDilation == other.timeDilation &&
-          platform == other.platform &&
-          isTestMode == other.isTestMode;
+      themeMode == other.themeMode &&
+      _textScaleFactor == other._textScaleFactor &&
+      timeDilation == other.timeDilation &&
+      platform == other.platform &&
+      isTestMode == other.isTestMode;
 
   @override
-  int get hashCode => hashValues(
-    themeMode,
-    _textScaleFactor,
-    timeDilation,
-    platform,
-    isTestMode,
-  );
+  int get hashCode => Object.hash(
+        themeMode,
+        _textScaleFactor,
+        timeDilation,
+        platform,
+        isTestMode,
+      );
 
   static AppOptions of(BuildContext context) {
     final scope =
-    context.dependOnInheritedWidgetOfExactType<_ModelBindingScope>();
-    return scope.modelBindingState.currentModel;
+        context.dependOnInheritedWidgetOfExactType<_ModelBindingScope>();
+    assert(scope != null, 'ModelBinding ancestor required');
+    return scope!.modelBindingState.currentModel;
   }
 
   static void update(BuildContext context, AppOptions newModel) {
     final scope =
-    context.dependOnInheritedWidgetOfExactType<_ModelBindingScope>();
-    scope.modelBindingState.updateModel(newModel);
+        context.dependOnInheritedWidgetOfExactType<_ModelBindingScope>();
+    assert(scope != null, 'ModelBinding ancestor required');
+    scope!.modelBindingState.updateModel(newModel);
   }
 }
 
 class ApplyTextOptions extends StatelessWidget {
-  const ApplyTextOptions({@required this.child});
+  const ApplyTextOptions({super.key, required this.child});
 
   final Widget child;
 
@@ -109,23 +111,20 @@ class ApplyTextOptions extends StatelessWidget {
     final options = AppOptions.of(context);
     final textScaleFactor = options.textScaleFactor(context);
 
-    Widget widget = MediaQuery(
+    return MediaQuery(
       data: MediaQuery.of(context).copyWith(
-        textScaleFactor: textScaleFactor,
+        textScaler: TextScaler.linear(textScaleFactor),
       ),
       child: child,
     );
-    return widget;
   }
 }
 
 class _ModelBindingScope extends InheritedWidget {
-  _ModelBindingScope({
-    Key key,
-    @required this.modelBindingState,
-    Widget child,
-  })  : assert(modelBindingState != null),
-        super(key: key, child: child);
+  const _ModelBindingScope({
+    required this.modelBindingState,
+    required super.child,
+  });
 
   final _ModelBindingState modelBindingState;
 
@@ -134,12 +133,11 @@ class _ModelBindingScope extends InheritedWidget {
 }
 
 class ModelBinding extends StatefulWidget {
-  ModelBinding({
-    Key key,
+  const ModelBinding({
+    super.key,
     this.initialModel = const AppOptions(),
-    this.child,
-  })  : assert(initialModel != null),
-        super(key: key);
+    required this.child,
+  });
 
   final AppOptions initialModel;
   final Widget child;
@@ -149,8 +147,8 @@ class ModelBinding extends StatefulWidget {
 }
 
 class _ModelBindingState extends State<ModelBinding> {
-  AppOptions currentModel;
-  Timer _timeDilationTimer;
+  late AppOptions currentModel;
+  Timer? _timeDilationTimer;
 
   @override
   void initState() {
@@ -161,7 +159,6 @@ class _ModelBindingState extends State<ModelBinding> {
   @override
   void dispose() {
     _timeDilationTimer?.cancel();
-    _timeDilationTimer = null;
     super.dispose();
   }
 

@@ -17,7 +17,7 @@ bool detailsDrawerOpened = false;
 class DetailsScreen extends StatefulWidget {
   final LogDetailsLoadArguments arguments;
 
-  DetailsScreen({@required this.arguments});
+  const DetailsScreen({super.key, required this.arguments});
 
   @override
   _DetailsScreenState createState() => _DetailsScreenState();
@@ -96,5 +96,5 @@ class _DetailsScreenState extends State<DetailsScreen> {
 class LogDetailsLoadArguments {
   final String logId;
 
-  LogDetailsLoadArguments({@required this.logId});
+  const LogDetailsLoadArguments({required this.logId});
 }

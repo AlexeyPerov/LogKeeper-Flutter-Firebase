@@ -1,12 +1,11 @@
 import 'dart:math';
 
 import 'package:clipboard/clipboard.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:log_keep/app/theme/themes.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/screens/details/details_screen.dart';
-import 'package:proviso/proviso.dart';
+import 'package:log_keep/common/widgets/condition_widget.dart';
 import 'package:web_browser/web_browser.dart';
 import 'package:universal_html/html.dart' as html;
 
@@ -15,19 +14,18 @@ class LogContentsView extends StatefulWidget {
   final int mode;
   final bool webView;
 
-  LogContentsView(
-      {Key key,
-      @required this.log,
-      @required this.mode,
-      @required this.webView})
-      : super(key: key);
+  const LogContentsView(
+      {super.key,
+      required this.log,
+      required this.mode,
+      required this.webView});
 
   @override
   _LogContentsViewState createState() => _LogContentsViewState();
 }
 
 class _LogContentsViewState extends State<LogContentsView> {
-  var _lineParams = Map<int, _LineOptions>();
+  final Map<int, _LineOptions> _lineParams = {};
 
   var _logTextStyle = const TextStyle(
       height: 1.5, fontSize: 14.0, letterSpacing: 0.75, wordSpacing: 1.1);
@@ -111,11 +109,12 @@ class _LogContentsViewState extends State<LogContentsView> {
     }
   }
 
-  Widget _buildLogListView(
-      {List<LogLine> lines,
-      Map<int, _LineOptions> lineParams,
-      bool selectableText,
-      bool showAlarmIcons}) {
+  Widget _buildLogListView({
+    required List<LogLine> lines,
+    required Map<int, _LineOptions> lineParams,
+    required bool selectableText,
+    required bool showAlarmIcons,
+  }) {
     var width = MediaQuery.of(context).size.width;
     final limitedView = width <= 1024;
 
@@ -134,17 +133,14 @@ class _LogContentsViewState extends State<LogContentsView> {
         var longLine = canBeFolded;
         var alarm = line.alarm;
 
-        var selectable = lineParams[line.index] != null
-            ? lineParams[line.index].selectable
-            : selectableText;
+        final opts = lineParams[line.index];
+        var selectable = opts?.selectable ?? selectableText;
 
         var defaultUnfoldedValue = !longLine || !canBeFolded || alarm;
         if (limitedView) {
           defaultUnfoldedValue = false;
         }
-        var unfolded = lineParams[line.index] != null
-            ? lineParams[line.index].unfolded
-            : defaultUnfoldedValue;
+        var unfolded = opts?.unfolded ?? defaultUnfoldedValue;
 
         var contents = line.contents;
 
@@ -156,8 +152,8 @@ class _LogContentsViewState extends State<LogContentsView> {
         }
 
         var backColor = index % 2 != 0
-            ? Theme.of(context).colorScheme.background
-            : Theme.of(context).colorScheme.onBackground;
+            ? Theme.of(context).colorScheme.surface
+            : Theme.of(context).colorScheme.onSurface;
 
         return Padding(
           padding: const EdgeInsets.only(top: 5),
@@ -226,10 +222,8 @@ class _LogContentsViewState extends State<LogContentsView> {
                 color: Colors.grey,
                 padding: const EdgeInsets.only(right: 5),
                 onPressed: () => setState(() {
-                      if (lineParams[line.index] == null) {
-                        lineParams[line.index] = _LineOptions();
-                      }
-                      lineParams[line.index].unfolded = false;
+                      lineParams[line.index] ??= _LineOptions();
+                      lineParams[line.index]!.unfolded = false;
                     })),
             fallback: IconButton(
                 icon: Icon(Icons.unfold_more),
@@ -237,10 +231,8 @@ class _LogContentsViewState extends State<LogContentsView> {
                 color: Theme.of(context).colorScheme.primary,
                 padding: const EdgeInsets.only(right: 5),
                 onPressed: () => setState(() {
-                      if (lineParams[line.index] == null) {
-                        lineParams[line.index] = _LineOptions();
-                      }
-                      lineParams[line.index].unfolded = true;
+                      lineParams[line.index] ??= _LineOptions();
+                      lineParams[line.index]!.unfolded = true;
                     }))),
         fallback: SizedBox(width: 40));
   }
@@ -251,13 +243,14 @@ class _LogContentsViewState extends State<LogContentsView> {
       return Container();
     }
 
-    final textColor = Theme.of(context).textTheme.bodyText1.color;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ??
+        Theme.of(context).colorScheme.onSurface;
     final textRgb =
-        'rgb(${textColor.red}, ${textColor.green}, ${textColor.blue})';
+        'rgb(${(textColor.r * 255).round()}, ${(textColor.g * 255).round()}, ${(textColor.b * 255).round()})';
 
-    final backColor = Theme.of(context).colorScheme.background;
+    final backColor = Theme.of(context).colorScheme.surface;
     final backRgb =
-        'rgb(${backColor.red}, ${backColor.green}, ${backColor.blue})';
+        'rgb(${(backColor.r * 255).round()}, ${(backColor.g * 255).round()}, ${(backColor.b * 255).round()})';
 
     var rawContents = widget.log.originalLog.data.contents;
     final contents = '<html><body style="background-color:$backRgb">'
@@ -287,13 +280,14 @@ class _LogContentsViewState extends State<LogContentsView> {
       return Container();
     }
 
-    final textColor = Theme.of(context).textTheme.bodyText1.color;
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color ??
+        Theme.of(context).colorScheme.onSurface;
     final textRgb =
-        'rgb(${textColor.red}, ${textColor.green}, ${textColor.blue})';
+        'rgb(${(textColor.r * 255).round()}, ${(textColor.g * 255).round()}, ${(textColor.b * 255).round()})';
 
-    final backColor = Theme.of(context).colorScheme.background;
+    final backColor = Theme.of(context).colorScheme.surface;
     final backRgb =
-        'rgb(${backColor.red}, ${backColor.green}, ${backColor.blue})';
+        'rgb(${(backColor.r * 255).round()}, ${(backColor.g * 255).round()}, ${(backColor.b * 255).round()})';
 
     var lineContents = '';
 

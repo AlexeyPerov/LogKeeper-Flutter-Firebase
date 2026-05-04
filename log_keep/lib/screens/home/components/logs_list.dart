@@ -15,14 +15,14 @@ import 'package:log_keep/screens/details/services/log_deletion_service.dart';
 import 'package:log_keep/screens/home/services/project_archiving_service.dart';
 import 'package:log_keep_shared/log_keep_shared.dart';
 import 'package:log_keep/common/utilities/string_extensions.dart';
-import 'package:proviso/proviso.dart';
+import 'package:log_keep/common/widgets/condition_widget.dart';
 
 class LogsList extends StatefulWidget {
   final List<ProjectInfo> projects;
   final String selectedProject;
 
-  LogsList({Key key, @required this.projects, @required this.selectedProject})
-      : super(key: key);
+  const LogsList(
+      {super.key, required this.projects, required this.selectedProject});
 
   @override
   _LogsListState createState() => _LogsListState();
@@ -99,7 +99,9 @@ class _LogsListState extends State<LogsList> {
         height: height,
         width: 175.0,
         decoration: BoxDecoration(
-          color: selected ? Theme.of(context).colorScheme.secondaryVariant  : Theme.of(context).cardColor,
+          color: selected
+              ? Theme.of(context).colorScheme.secondaryContainer
+              : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [selected ? heavyBoxShadow() : slightBoxShadow()],
         ),
@@ -201,17 +203,19 @@ class _LogsListState extends State<LogsList> {
                   condition: kIsWeb,
                   widget: LogCardMiniButton(
                       icon: Icons.filter,
-                      pressed: () => getIt<LogsRepository>()
+                      onPressed: () => getIt<LogsRepository>()
                           .getLogById(logInfo.id)
-                          .then((value) =>
-                              WebUtilities.openStringContentInNewPage(
-                                  value.data.contents))),
+                          .then((value) {
+                        if (value == null) return;
+                        WebUtilities.openStringContentInNewPage(
+                            value.data.contents);
+                      })),
                 ),
                 ConditionWidget(
                   condition: kIsWeb,
                   widget: LogCardMiniButton(
                       icon: Icons.delete,
-                      pressed: () => LogDeletionService.requestDeletion(
+                      onPressed: () => LogDeletionService.requestDeletion(
                           context, widget.selectedProject, logInfo)),
                 )
               ],
@@ -225,9 +229,10 @@ class _LogsListState extends State<LogsList> {
 
 class LogCardMiniButton extends StatelessWidget {
   final IconData icon;
-  final Function pressed;
+  final VoidCallback onPressed;
 
-  const LogCardMiniButton({Key key, this.icon, this.pressed}) : super(key: key);
+  const LogCardMiniButton(
+      {super.key, required this.icon, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +241,8 @@ class LogCardMiniButton extends StatelessWidget {
       child: SizedBox(
           height: 30,
           width: 30,
-          child: IconButton(icon: Icon(icon, size: 25), onPressed: pressed)),
+          child:
+              IconButton(icon: Icon(icon, size: 25), onPressed: onPressed)),
     );
   }
 }

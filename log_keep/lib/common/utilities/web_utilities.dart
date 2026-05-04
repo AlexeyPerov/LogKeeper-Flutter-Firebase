@@ -16,14 +16,17 @@ class WebUtilities {
       ..href = url
       ..style.display = 'none'
       ..download = 'log.txt';
-    html.document.body.children.add(anchor);
+    final body = html.document.body;
+    if (body == null) {
+      return;
+    }
+    body.children.add(anchor);
     anchor.click();
-    html.document.body.children.remove(anchor);
+    body.children.remove(anchor);
     html.Url.revokeObjectUrl(url);
   }
 
-  static String createHtmlForLogContents(
-      String rawContents) {
-    return '<html><body><pre>' + rawContents + '</pre></body></html>';
+  static String createHtmlForLogContents(String rawContents) {
+    return '<html><body><pre>$rawContents</pre></body></html>';
   }
 }

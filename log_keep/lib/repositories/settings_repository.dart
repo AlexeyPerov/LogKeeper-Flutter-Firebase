@@ -3,7 +3,7 @@ import 'package:path_provider/path_provider.dart' as pathProvider;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 abstract class SettingsRepository {
-  Future initialize();
+  Future<void> initialize();
 
   dynamic get(String key, dynamic defaultValue);
   void put(String key, dynamic value);

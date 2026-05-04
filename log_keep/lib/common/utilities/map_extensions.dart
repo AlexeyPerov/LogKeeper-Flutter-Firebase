@@ -1,9 +1,12 @@
 extension MapExtension<K, V> on Map<K, V> {
   V getValueOrDefault(K key, V defaultValue) {
-    if (this == null || !this.containsKey(key)) {
+    if (!containsKey(key)) {
       return defaultValue;
     }
-
-    return this[key];
+    final value = this[key];
+    if (value == null) {
+      return defaultValue;
+    }
+    return value;
   }
 }

@@ -4,40 +4,46 @@ import 'package:log_keep/app/configs.dart';
 import 'package:log_keep/app/theme/theme_constants.dart';
 import 'package:log_keep/app/theme/themes.dart';
 import 'package:log_keep/common/utilities/web_utilities.dart';
+import 'package:log_keep/common/widgets/condition_widget.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/repositories/settings_repository.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
-import 'package:proviso/proviso.dart';
 import 'log_contents_view.dart';
 
 class LogView extends StatefulWidget {
   final LogAnalysisEntity log;
   final TextEditingController linkController;
-  final Function onDelete;
+  final VoidCallback onDelete;
   final SettingsRepository settings;
 
-  LogView(
-      {Key key,
-      @required this.log,
-      @required this.onDelete,
-      @required this.settings})
-      : this.linkController = new TextEditingController(
-            text: serverUrlFormat() + log.originalLog.info.id),
-        super(key: key);
+  LogView({
+    super.key,
+    required this.log,
+    required this.onDelete,
+    required this.settings,
+  }) : linkController = TextEditingController(
+          text: serverUrlFormat() + log.originalLog.info.id,
+        );
 
   @override
-  _LogViewState createState() => _LogViewState(
-      settings.getInt("selected_log_mode"),
-      settings.getBool("selected_web_view_mode"));
+  State<LogView> createState() => _LogViewState();
 }
 
 class _LogViewState extends State<LogView> {
-  int _mode;
-  bool _useWebView;
+  late int _mode;
+  late bool _useWebView;
 
-  _LogViewState(int defaultMode, bool defaultUseWebView) {
-    _mode = defaultMode;
-    _useWebView = defaultUseWebView;
+  @override
+  void initState() {
+    super.initState();
+    _mode = widget.settings.getInt('selected_log_mode');
+    _useWebView = widget.settings.getBool('selected_web_view_mode');
+  }
+
+  @override
+  void dispose() {
+    widget.linkController.dispose();
+    super.dispose();
   }
 
   @override
@@ -83,13 +89,13 @@ class _LogViewState extends State<LogView> {
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () {
-                    if (_mode == 0)
+                    if (_mode == 0) {
                       setState(() {
-                        // we need this because webView block all ray casts on top of it
                         _useWebView = false;
                         widget.settings
-                            .putBool("selected_web_view_mode", false);
+                            .putBool('selected_web_view_mode', false);
                       });
+                    }
                     widget.onDelete();
                   },
                   icon: Icon(Icons.delete, size: 25),
@@ -126,7 +132,7 @@ class _LogViewState extends State<LogView> {
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: Scrollbar(
             child: ConstrainedBox(
-              constraints: new BoxConstraints(
+              constraints: const BoxConstraints(
                 minHeight: 10.0,
                 maxHeight: 100.0,
               ),
@@ -154,50 +160,50 @@ class _LogViewState extends State<LogView> {
 
   Widget _buildModesList(bool limitedView) {
     var width = MediaQuery.of(context).size.width;
-    final limitedView = width <= 1024;
+    final narrow = width <= 1024;
 
     return Row(
       children: [
         ConditionWidget(
-          condition: limitedView,
+          condition: narrow,
           widget: IconButton(
             padding: EdgeInsets.zero,
             onPressed: () => HomeScreenNavigation.navigate(context),
             icon: Icon(Icons.arrow_back_ios, size: 25),
           ),
         ),
-        ConditionWidget(condition: !limitedView, widget: Spacer()),
-        _modeCard(Icons.web, "Raw", 0, 0, false),
+        ConditionWidget(condition: !narrow, widget: Spacer()),
+        _modeCard(Icons.web, 'Raw', 0, 0, false),
         ConditionWidget(
             condition: widget.log.alarmsCount > 0,
-            widget: _modeCard(Icons.error_outline, "Alarms", 2,
+            widget: _modeCard(Icons.error_outline, 'Alarms', 2,
                 widget.log.alarmsCount, true)),
         ConditionWidget(
-            condition: widget.log.lines.length > 0,
-            widget: _modeCard(
-                Icons.view_headline, "Logs", 1, widget.log.lines.length, true)),
+            condition: widget.log.lines.isNotEmpty,
+            widget: _modeCard(Icons.view_headline, 'Logs', 1,
+                widget.log.lines.length, true)),
         ConditionWidget(
-            condition: !limitedView && widget.log.modelCount > 0,
+            condition: !narrow && widget.log.modelCount > 0,
             widget: _modeCard(
-                Icons.view_headline, "Server", 3, widget.log.modelCount, true)),
+                Icons.view_headline, 'Server', 3, widget.log.modelCount, true)),
         ConditionWidget(
-            condition: !limitedView && widget.log.cheatCount > 0,
+            condition: !narrow && widget.log.cheatCount > 0,
             widget: _modeCard(
-                Icons.view_headline, "Cheat", 4, widget.log.cheatCount, true)),
+                Icons.view_headline, 'Cheat', 4, widget.log.cheatCount, true)),
         ConditionWidget(
-            condition: !limitedView && widget.log.tutorialCount > 0,
-            widget: _modeCard(Icons.view_headline, "Tutorial", 5,
+            condition: !narrow && widget.log.tutorialCount > 0,
+            widget: _modeCard(Icons.view_headline, 'Tutorial', 5,
                 widget.log.tutorialCount, true)),
-        SizedBox(width: limitedView ? 3 : 5),
+        SizedBox(width: narrow ? 3 : 5),
         ConditionWidget(
           condition: width > 700,
-          widget: _card(Icons.open_in_new_rounded, "New tab", () {
+          widget: _card(Icons.open_in_new_rounded, 'New tab', () {
             WebUtilities.openStringContentInNewPage(
                 widget.log.originalLog.data.contents);
           }),
         ),
-        SizedBox(width: limitedView ? 3 : 25),
-        ConditionWidget(condition: !limitedView, widget: Spacer()),
+        SizedBox(width: narrow ? 3 : 25),
+        ConditionWidget(condition: !narrow, widget: Spacer()),
         IgnorePointer(
           ignoring: _mode == 0,
           child: Column(
@@ -206,15 +212,15 @@ class _LogViewState extends State<LogView> {
                   iconSize: 35,
                   icon: Icon(Icons.request_page_outlined),
                   color: _useWebView || _mode == 0
-                      ? Theme.of(context).colorScheme.primaryVariant
+                      ? Theme.of(context).colorScheme.primaryContainer
                       : Colors.grey,
                   onPressed: () {
                     setState(() {
                       _useWebView = true;
-                      widget.settings.putBool("selected_web_view_mode", true);
+                      widget.settings.putBool('selected_web_view_mode', true);
                     });
                   }),
-              Text("Web", style: TextStyle(fontSize: 10))
+              Text('Web', style: TextStyle(fontSize: 10))
             ],
           ),
         ),
@@ -226,15 +232,15 @@ class _LogViewState extends State<LogView> {
                   iconSize: 35,
                   icon: Icon(Icons.view_list),
                   color: !_useWebView
-                      ? Theme.of(context).colorScheme.primaryVariant
+                      ? Theme.of(context).colorScheme.primaryContainer
                       : Colors.grey,
                   onPressed: () {
                     setState(() {
                       _useWebView = false;
-                      widget.settings.putBool("selected_web_view_mode", false);
+                      widget.settings.putBool('selected_web_view_mode', false);
                     });
                   }),
-              Text("Flutter", style: TextStyle(fontSize: 10))
+              Text('Flutter', style: TextStyle(fontSize: 10))
             ],
           ),
           fallback: SizedBox(width: 51),
@@ -254,7 +260,7 @@ class _LogViewState extends State<LogView> {
       onTap: () {
         setState(() {
           _mode = index;
-          widget.settings.putInt("selected_log_mode", index);
+          widget.settings.putInt('selected_log_mode', index);
         });
       },
       child: Container(
@@ -266,47 +272,45 @@ class _LogViewState extends State<LogView> {
           border: Border.all(
               color: selected
                   ? Color(0xFFC19652)
-                  : Theme.of(context).colorScheme.background,
+                  : Theme.of(context).colorScheme.surface,
               width: selected ? 0.5 : 0.5),
           color: selected
-              ? Theme.of(context).colorScheme.secondaryVariant
+              ? Theme.of(context).colorScheme.secondaryContainer
               : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [selected ? heavyBoxShadow() : slightBoxShadow()],
         ),
-        child: Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0),
-                child: Text(title, overflow: TextOverflow.fade, maxLines: 1),
-              ),
-              Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: 15.0, bottom: 10.0),
-                    child: Text(additionalCountInfo != 0
-                        ? additionalCountInfo.toString()
-                        : ""),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(right: 15.0, bottom: 10.0),
-                    child: Icon(icon),
-                  ),
-                ],
-              )
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0),
+              child: Text(title, overflow: TextOverflow.fade, maxLines: 1),
+            ),
+            Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(left: 15.0, bottom: 10.0),
+                  child: Text(additionalCountInfo != 0
+                      ? additionalCountInfo.toString()
+                      : ''),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(right: 15.0, bottom: 10.0),
+                  child: Icon(icon),
+                ),
+              ],
+            )
+          ],
         ),
       ),
     );
   }
 
-  Widget _card(IconData icon, String title, Function onTap) {
+  Widget _card(IconData icon, String title, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(

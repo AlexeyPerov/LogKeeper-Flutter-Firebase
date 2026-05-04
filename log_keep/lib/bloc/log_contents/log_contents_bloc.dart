@@ -1,26 +1,25 @@
 import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:log_keep/bloc/log_contents/log_contents.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
-import 'log_contents_state.dart';
 
 class LogContentsBloc extends Bloc<LogContentsEvent, LogContentsState> {
-  final LogsRepository logsRepository;
-
-  LogContentsBloc({this.logsRepository}) : super(LogContentsNotLoaded());
-
-  @override
-  Stream<LogContentsState> mapEventToState(LogContentsEvent event) async* {
-    if (event is LoadLogContents) {
-      yield* _mapLoadLogContentsToState(event);
-    } else if (event is LogContentsUpdated) {
-      yield* _mapLogContentsUpdateToState(event);
-    }
+  LogContentsBloc({required this.logsRepository}) : super(LogContentsNotLoaded()) {
+    on<LoadLogContents>(_onLoadLogContents);
+    on<LogContentsUpdated>(_onLogContentsUpdated);
   }
 
-  Stream<LogContentsState> _mapLoadLogContentsToState(
-      LoadLogContents event) async* {
-    var log = await logsRepository.getLogById(event.id);
+  final LogsRepository logsRepository;
+
+  Future<void> _onLoadLogContents(
+    LoadLogContents event,
+    Emitter<LogContentsState> emit,
+  ) async {
+    final log = await logsRepository.getLogById(event.id);
+    if (log == null) {
+      return;
+    }
 
     var linesRaw = log.data.contents.split(RegExp(r"\|[0-9]+\|"));
     var lines = List<LogLine>.empty(growable: true);
@@ -29,12 +28,12 @@ class LogContentsBloc extends Bloc<LogContentsEvent, LogContentsState> {
     var totalModelCount = 0;
     var totalTutorialCount = 0;
 
-    final alarmExp = new RegExp(
+    final alarmExp = RegExp(
         'exception|warning|incorrect|timeout|unable|cannot|fail|can\'t',
         caseSensitive: false);
-    final cheatExp = new RegExp('cheat', caseSensitive: false);
-    final tutorialExp = new RegExp('tutorial', caseSensitive: false);
-    final modelExp = new RegExp(
+    final cheatExp = RegExp('cheat', caseSensitive: false);
+    final tutorialExp = RegExp('tutorial', caseSensitive: false);
+    final modelExp = RegExp(
         r'(\[PlayerService\])|(\[Server\])|(Request:)|(Response:)|(Received response)',
         caseSensitive: false);
 
@@ -51,7 +50,7 @@ class LogContentsBloc extends Bloc<LogContentsEvent, LogContentsState> {
 
       var alarmsCount = alarmExp.allMatches(rawLine).length;
 
-      final errorMatches = rawLine.allMatches("error").length;
+      final errorMatches = rawLine.allMatches('error').length;
       final fakeErrorMatches = rawLine.allMatches('error\":null').length;
       if (errorMatches != fakeErrorMatches) {
         alarmsCount = errorMatches - fakeErrorMatches;
@@ -74,8 +73,10 @@ class LogContentsBloc extends Bloc<LogContentsEvent, LogContentsState> {
         totalCheatCount, totalModelCount, totalTutorialCount)));
   }
 
-  Stream<LogContentsState> _mapLogContentsUpdateToState(
-      LogContentsUpdated event) async* {
-    yield LogContentsLoaded(event.log);
+  void _onLogContentsUpdated(
+    LogContentsUpdated event,
+    Emitter<LogContentsState> emit,
+  ) {
+    emit(LogContentsLoaded(event.log));
   }
 }

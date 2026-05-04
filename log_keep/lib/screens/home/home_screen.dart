@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:log_keep/app/app.dart';
 import 'package:log_keep/app/theme/theme_constants.dart';
@@ -29,10 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
       return TextButton(
           child: Text(
             "Authorize".toUpperCase(),
-            style: Theme.of(context)
-                .textTheme
-                .headline6
-                .copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ) ??
+                const TextStyle(fontWeight: FontWeight.bold),
           ),
           onPressed: () {
             HomeScreenNavigation.navigate(context);

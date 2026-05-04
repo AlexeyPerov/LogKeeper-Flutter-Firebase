@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'dart:io' show File;
+
 import 'package:clipboard/clipboard.dart';
-import 'package:file_picker_cross/file_picker_cross.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,13 +11,14 @@ import 'package:log_keep/app/configs.dart';
 import 'package:log_keep/app/theme/theme_constants.dart';
 import 'package:log_keep/app/theme/themes.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
+import 'package:log_keep_shared/log_keep_shared.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
 import 'package:uiblock/uiblock.dart';
 
 class AddLogForm extends StatefulWidget {
   final AddLogFormParameters form;
 
-  const AddLogForm({Key key, @required this.form}) : super(key: key);
+  const AddLogForm({super.key, required this.form});
 
   @override
   _AddLogFormState createState() => _AddLogFormState();
@@ -23,11 +27,11 @@ class AddLogForm extends StatefulWidget {
 class _AddLogFormState extends State<AddLogForm> {
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController _authorController;
-  TextEditingController _titleController;
-  TextEditingController _projectController;
-  TextEditingController _fileController;
-  String _contents;
+  late final TextEditingController _authorController;
+  late final TextEditingController _titleController;
+  late final TextEditingController _projectController;
+  late final TextEditingController _fileController;
+  String? _contents;
 
   @override
   void initState() {
@@ -100,15 +104,22 @@ class _AddLogFormState extends State<AddLogForm> {
                     decoration: _textFieldStyle(helperText: 'File to upload'),
                     validator: _validateNonEmpty,
                     onTap: () async {
-                      FilePickerCross logFile =
-                          await FilePickerCross.importFromStorage(
-                              type: FileTypeCross.custom,
-                              fileExtension: '.txt, .md, .log');
-
+                      final result = await FilePicker.platform.pickFiles(
+                        type: FileType.custom,
+                        allowedExtensions: const ['txt', 'md', 'log'],
+                      );
+                      if (result == null || result.files.isEmpty) {
+                        return;
+                      }
+                      final picked = result.files.single;
                       try {
-                        _contents = logFile.toString();
+                        if (picked.bytes != null) {
+                          _contents = utf8.decode(picked.bytes!);
+                        } else if (picked.path != null) {
+                          _contents = await File(picked.path!).readAsString();
+                        }
                         setState(() {
-                          _fileController.text = logFile.fileName;
+                          _fileController.text = picked.name;
                         });
                       } catch (e) {
                         logger.e(e);
@@ -130,13 +141,14 @@ class _AddLogFormState extends State<AddLogForm> {
                         ),
                         child: GestureDetector(
                           behavior: HitTestBehavior.translucent,
-                          onTap: () => () {
-                            if (_formKey.currentState.validate()) {
+                          onTap: () {
+                            if (_formKey.currentState?.validate() ?? false) {
                               widget.form.logInputData.author =
                                   _authorController.text;
                               widget.form.logInputData.title =
                                   _titleController.text;
-                              widget.form.logInputData.contents = _contents;
+                              widget.form.logInputData.contents =
+                                  _contents ?? '';
                               widget.form.logInputData.createdAt =
                                   DateTime.now();
                               widget.form.project = _projectController.text;
@@ -166,8 +178,8 @@ class _AddLogFormState extends State<AddLogForm> {
     );
   }
 
-  static String _validateNonEmpty(String value) {
-    if (value.isEmpty) {
+  static String? _validateNonEmpty(String? value) {
+    if (value == null || value.isEmpty) {
       return 'Field cannot be empty';
     }
     return null;
@@ -179,10 +191,10 @@ class _AddLogFormState extends State<AddLogForm> {
       helperText: helperText,
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.grey[500])),
+          borderSide: BorderSide(color: Colors.grey.shade500)),
       enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.grey[300])),
+          borderSide: BorderSide(color: Colors.grey.shade300)),
     );
   }
 
@@ -193,10 +205,12 @@ class _AddLogFormState extends State<AddLogForm> {
 
     RepositoryProvider.of<LogsRepository>(context)
         .addLog(widget.form.project, widget.form.logInputData)
-        .then((value) => {
-              if (!kIsWeb) {_copyLink(context, value)}
-            })
-        .whenComplete(() => {_additionCompleted(context)});
+        .then((value) {
+          if (!kIsWeb) {
+            _copyLink(context, value);
+          }
+        })
+        .whenComplete(() => _additionCompleted(context));
   }
 
   void _additionCompleted(BuildContext context) {
@@ -214,8 +228,13 @@ class _AddLogFormState extends State<AddLogForm> {
 }
 
 class AddLogFormParameters {
-  final LogCreationArguments logInputData = new LogCreationArguments();
+  final LogCreationArguments logInputData = LogCreationArguments(
+    author: '',
+    title: '',
+    contents: '',
+    createdAt: DateTime.now(),
+  );
   String project;
 
-  AddLogFormParameters({this.project});
+  AddLogFormParameters({this.project = defaultProjectName});
 }
