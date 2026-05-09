@@ -150,9 +150,13 @@ class _LogContentsViewState extends State<LogContentsView> {
               : (firstLine + '\n.....');
         }
 
-        var backColor = index % 2 != 0
-            ? Theme.of(context).colorScheme.surface
-            : Theme.of(context).colorScheme.onSurface;
+        final theme = Theme.of(context);
+        final cardBackground = theme.cardColor;
+        final alternateStripe = theme.brightness == Brightness.dark
+            ? Color.lerp(cardBackground, Colors.white, 0.08)!
+            : Color.lerp(cardBackground, Colors.black, 0.06)!;
+        final backColor =
+            index.isEven ? cardBackground : alternateStripe;
 
         return Padding(
           padding: const EdgeInsets.only(top: 5),
@@ -267,6 +271,7 @@ class _LogContentsViewState extends State<LogContentsView> {
       child: LogHtmlPreview(
         html: contents,
         maxContentWidth: browserWidth.toDouble(),
+        plainTextFallback: rawContents,
       ),
     );
   }
@@ -305,6 +310,7 @@ class _LogContentsViewState extends State<LogContentsView> {
       child: LogHtmlPreview(
         html: contents,
         maxContentWidth: browserWidth.toDouble(),
+        plainTextFallback: lines.map((l) => l.contents).join('\n'),
       ),
     );
   }

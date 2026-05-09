@@ -1,55 +1,44 @@
 import 'dart:math';
 
-import 'package:flutter/widgets.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter/material.dart';
 
-/// Renders [html] in a WebView (iframe on web). [maxContentWidth] caps width
-/// like the legacy WebBrowser iframe setting.
-class LogHtmlPreview extends StatefulWidget {
+import 'log_html_preview_stub.dart'
+    if (dart.library.html) 'log_html_preview_web.dart'
+    if (dart.library.io) 'log_html_preview_io.dart';
+
+/// Renders HTML inline where supported (iframe on web, WebView on Android/iOS).
+/// On desktop (macOS, Windows, Linux), uses [plainTextFallback] instead — native
+/// WebView does not implement `setJavaScriptMode` there.
+class LogHtmlPreview extends StatelessWidget {
   const LogHtmlPreview({
     super.key,
     required this.html,
     required this.maxContentWidth,
+    required this.plainTextFallback,
   });
 
   final String html;
   final double maxContentWidth;
 
-  @override
-  State<LogHtmlPreview> createState() => _LogHtmlPreviewState();
-}
-
-class _LogHtmlPreviewState extends State<LogHtmlPreview> {
-  late final WebViewController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadHtmlString(widget.html);
-  }
-
-  @override
-  void didUpdateWidget(LogHtmlPreview oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.html != widget.html) {
-      _controller.loadHtmlString(widget.html);
-    }
-  }
+  /// Raw log text used when inline HTML rendering is unavailable (desktop).
+  final String plainTextFallback;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = min(widget.maxContentWidth, constraints.maxWidth);
-        final height = constraints.maxHeight.isFinite && constraints.maxHeight > 0
-            ? constraints.maxHeight
-            : 400.0;
+        final width = min(maxContentWidth, constraints.maxWidth);
+        final height =
+            constraints.maxHeight.isFinite && constraints.maxHeight > 0
+                ? constraints.maxHeight
+                : 400.0;
         return SizedBox(
           width: width,
           height: height,
-          child: WebViewWidget(controller: _controller),
+          child: buildLogHtmlPreview(
+            html: html,
+            plainTextFallback: plainTextFallback,
+          ),
         );
       },
     );
