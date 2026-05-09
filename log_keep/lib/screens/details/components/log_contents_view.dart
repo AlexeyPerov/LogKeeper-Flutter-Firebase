@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:convert';
 
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
@@ -255,14 +255,15 @@ class _LogContentsViewState extends State<LogContentsView> {
     final backRgb =
         'rgb(${(backColor.r * 255).round()}, ${(backColor.g * 255).round()}, ${(backColor.b * 255).round()})';
 
-    var rawContents = widget.log.originalLog.data.contents;
-    final contents = '<html><body style="background-color:$backRgb">'
-            '<pre style="color:$textRgb">' +
-        rawContents +
+    final rawContents = widget.log.originalLog.data.contents;
+    final escaped = const HtmlEscape().convert(rawContents);
+    final contents =
+        '<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head>'
+        '<body style="margin:0;padding:8px;background-color:$backRgb;box-sizing:border-box;">'
+        '<pre style="color:$textRgb;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;margin:0;width:100%;max-width:100%;box-sizing:border-box;font-family:monospace;font-size:14px;line-height:1.4;">'
+        '$escaped'
         '</pre></body></html>';
 
-    var width = MediaQuery.of(context).size.width;
-    var browserWidth = min(850, width);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(1),
@@ -270,7 +271,7 @@ class _LogContentsViewState extends State<LogContentsView> {
       alignment: Alignment.center,
       child: LogHtmlPreview(
         html: contents,
-        maxContentWidth: browserWidth.toDouble(),
+        maxContentWidth: double.infinity,
         plainTextFallback: rawContents,
       ),
     );
@@ -291,17 +292,14 @@ class _LogContentsViewState extends State<LogContentsView> {
     final backRgb =
         'rgb(${(backColor.r * 255).round()}, ${(backColor.g * 255).round()}, ${(backColor.b * 255).round()})';
 
-    var lineContents = '';
+    final body = lines.map((l) => const HtmlEscape().convert(l.contents)).join('\n');
+    final contents =
+        '<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head>'
+        '<body style="margin:0;padding:8px;background-color:$backRgb;box-sizing:border-box;">'
+        '<pre style="color:$textRgb;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;margin:0;width:100%;max-width:100%;box-sizing:border-box;font-family:monospace;font-size:14px;line-height:1.4;">'
+        '$body'
+        '</pre></body></html>';
 
-    for (var line in lines) {
-      lineContents += '<pre style="color:$textRgb">' + line.contents + '</pre>';
-    }
-
-    final contents = '<html><body style="background-color:$backRgb">' +
-        lineContents +
-        '</body></html>';
-    var width = MediaQuery.of(context).size.width;
-    var browserWidth = min(850, width);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(1),
@@ -309,7 +307,7 @@ class _LogContentsViewState extends State<LogContentsView> {
       alignment: Alignment.center,
       child: LogHtmlPreview(
         html: contents,
-        maxContentWidth: browserWidth.toDouble(),
+        maxContentWidth: double.infinity,
         plainTextFallback: lines.map((l) => l.contents).join('\n'),
       ),
     );
