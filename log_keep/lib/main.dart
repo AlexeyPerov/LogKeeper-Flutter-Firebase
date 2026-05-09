@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_web/webview_flutter_web.dart';
 import 'package:log_keep/bloc/global/events_stream.dart';
 import 'package:log_keep/repositories/auth_repository.dart';
 import 'package:log_keep/repositories/settings_repository.dart';
@@ -8,7 +10,6 @@ import 'package:log_keep/screens/auth/auth_screen.dart';
 import 'package:log_keep/screens/details/details_screen.dart';
 import 'package:log_keep/screens/error/error_screen.dart';
 import 'package:log_keep/screens/home/home_screen.dart';
-import 'package:log_keep/screens/splash/splash_screen.dart';
 import 'package:log_keep/app/theme/themes.dart';
 import 'package:log_keep/common/utilities/routing/routing_extensions.dart';
 import 'app/app.dart';
@@ -17,18 +18,31 @@ import 'app/theme/theme_constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  getIt.registerSingleton<EventsStream>(CommonEventsStream());
-  getIt.registerSingleton<SettingsRepository>(HiveSettingsRepository());
+  if (kIsWeb) {
+    WebViewPlatform.instance ??= WebWebViewPlatform();
+  }
 
-  await getIt.get<SettingsRepository>().initialize();
+  try {
+    getIt.registerSingleton<EventsStream>(CommonEventsStream());
+    getIt.registerSingleton<SettingsRepository>(HiveSettingsRepository());
 
-  runApp(const AppWidget());
+    await getIt.get<SettingsRepository>().initialize();
+    await App.initializeApp();
+
+    runApp(const AppWidget());
+  } catch (e, st) {
+    debugPrintStack(stackTrace: st, label: e.toString());
+    runApp(
+      MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: const ErrorScreen(),
+      ),
+    );
+  }
 }
 
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
-
-  static final Future<void> _appInitialization = App.initializeApp();
 
   @override
   Widget build(BuildContext context) => ModelBinding(
@@ -63,44 +77,23 @@ class AppWidget extends StatelessWidget {
     );
   }
 
-  Widget _redirectOnAppInit(RouteToWidget routeTo) {
-    return FutureBuilder<void>(
-      future: _appInitialization,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const ErrorScreen();
-        }
-
-        if (snapshot.connectionState == ConnectionState.done) {
-          return routeTo();
-        }
-
-        return const SplashScreen();
-      },
-    );
-  }
-
   Route<dynamic> _generateRoute(RouteSettings settings) {
     final name = settings.name ?? '/';
     var routingData = name.getRoutingData;
     switch (routingData.route) {
       case '/details':
         return MaterialPageRoute(
-            builder: (context) => _redirectOnAppInit(() => DetailsScreen(
-                arguments: LogDetailsLoadArguments(
-                    logId: routingData['id'] ?? ''))));
+          builder: (context) => DetailsScreen(
+            arguments:
+                LogDetailsLoadArguments(logId: routingData['id'] ?? ''),
+          ),
+        );
     }
     final authRepository = getIt<AuthRepository>();
     if (authRepository.isLoggedIn() || !authRepository.isRequired()) {
-      return MaterialPageRoute(
-        builder: (context) => _redirectOnAppInit(() => HomeScreen()),
-      );
+      return MaterialPageRoute(builder: (context) => HomeScreen());
     } else {
-      return MaterialPageRoute(
-        builder: (context) => _redirectOnAppInit(() => AuthScreen()),
-      );
+      return MaterialPageRoute(builder: (context) => AuthScreen());
     }
   }
 }
-
-typedef RouteToWidget = Widget Function();

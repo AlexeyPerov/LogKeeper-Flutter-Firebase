@@ -6,8 +6,7 @@ import 'package:log_keep/app/theme/themes.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
 import 'package:log_keep/screens/details/details_screen.dart';
 import 'package:log_keep/common/widgets/condition_widget.dart';
-import 'package:web_browser/web_browser.dart';
-import 'package:universal_html/html.dart' as html;
+import 'package:log_keep/common/widgets/log_html_preview.dart';
 
 class LogContentsView extends StatefulWidget {
   final LogAnalysisEntity log;
@@ -258,19 +257,17 @@ class _LogContentsViewState extends State<LogContentsView> {
         rawContents +
         '</pre></body></html>';
 
-    final blob = html.Blob([contents], 'text/html');
-    final url = html.Url.createObjectUrlFromBlob(blob);
     var width = MediaQuery.of(context).size.width;
     var browserWidth = min(850, width);
     return Container(
-      padding: EdgeInsets.all(1),
+      width: double.infinity,
+      padding: const EdgeInsets.all(1),
       decoration: BoxDecoration(color: Colors.grey[300]),
-      child: WebBrowser(
-          initialUrl: url,
-          iframeSettings: WebBrowserIFrameSettings(
-              width: '"' + browserWidth.toString() + '"'),
-          interactionSettings:
-              WebBrowserInteractionSettings(topBar: null, bottomBar: null)),
+      alignment: Alignment.center,
+      child: LogHtmlPreview(
+        html: contents,
+        maxContentWidth: browserWidth.toDouble(),
+      ),
     );
   }
 
@@ -298,19 +295,17 @@ class _LogContentsViewState extends State<LogContentsView> {
     final contents = '<html><body style="background-color:$backRgb">' +
         lineContents +
         '</body></html>';
-    final blob = html.Blob([contents], 'text/html');
-    final url = html.Url.createObjectUrlFromBlob(blob);
     var width = MediaQuery.of(context).size.width;
     var browserWidth = min(850, width);
     return Container(
-      padding: EdgeInsets.all(1),
+      width: double.infinity,
+      padding: const EdgeInsets.all(1),
       decoration: BoxDecoration(color: Colors.grey[300]),
-      child: WebBrowser(
-          initialUrl: url,
-          iframeSettings: WebBrowserIFrameSettings(
-              width: '"' + browserWidth.toString() + '"'),
-          interactionSettings:
-              WebBrowserInteractionSettings(topBar: null, bottomBar: null)),
+      alignment: Alignment.center,
+      child: LogHtmlPreview(
+        html: contents,
+        maxContentWidth: browserWidth.toDouble(),
+      ),
     );
   }
 }
