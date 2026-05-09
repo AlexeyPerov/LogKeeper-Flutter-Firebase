@@ -123,3 +123,6 @@ app.*.symbols
 **/.firebase/**
 **/.firebaserc
 firebaseConfig.js
+
+#Docs
+/specs/

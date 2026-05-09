@@ -5,6 +5,7 @@ import 'package:log_keep/bloc/global/events_stream.dart';
 import 'package:log_keep/bloc/global/global_events.dart';
 import 'package:log_keep/bloc/log_infos/log_infos_event.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
+import 'package:log_keep_shared/log_keep_shared.dart';
 
 import 'log_infos_state.dart';
 
@@ -44,7 +45,9 @@ class LogInfosBloc extends Bloc<LogInfosEvent, LogInfosState> {
     LogInfosUpdated event,
     Emitter<LogInfosState> emit,
   ) {
-    emit(LogInfosLoaded(event.logs));
+    final sorted = List<LogInfoEntity>.from(event.logs)
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    emit(LogInfosLoaded(sorted));
   }
 
   @override

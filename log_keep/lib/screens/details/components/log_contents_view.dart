@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:clipboard/clipboard.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:log_keep/app/theme/themes.dart';
 import 'package:log_keep/repositories/logs_repository.dart';
@@ -24,7 +25,28 @@ class LogContentsView extends StatefulWidget {
 }
 
 class _LogContentsViewState extends State<LogContentsView> {
+  static const _initialLineChunk = 2500;
+  static const _moreLineChunk = 6000;
+
   final Map<int, _LineOptions> _lineParams = {};
+  final Map<int, List<LogLine>> _filteredByMode = {};
+
+  String? _cachedWebViewHtml;
+  String? _cachedWebViewPlain;
+  List<LogLine>? _cachedWebViewLinesRef;
+  LogAnalysisEntity? _cachedWebViewLog;
+  int? _cachedWebViewMode;
+  String? _cachedWebViewTextRgb;
+  String? _cachedWebViewBackRgb;
+
+  String? _cachedRawHtml;
+  String? _cachedRawPlain;
+  LogAnalysisEntity? _cachedRawLog;
+  String? _cachedRawTextRgb;
+  String? _cachedRawBackRgb;
+
+  int _visibleLineLimit = 0;
+  List<LogLine>? _linesRefForIncremental;
 
   var _logTextStyle = const TextStyle(
       height: 1.5, fontSize: 14.0, letterSpacing: 0.75, wordSpacing: 1.1);
@@ -37,74 +59,121 @@ class _LogContentsViewState extends State<LogContentsView> {
       color: Colors.grey);
 
   @override
+  void didUpdateWidget(LogContentsView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.log, widget.log)) {
+      _filteredByMode.clear();
+      _lineParams.clear();
+      _cachedWebViewHtml = null;
+      _cachedWebViewLinesRef = null;
+      _cachedWebViewLog = null;
+      _cachedWebViewMode = null;
+      _cachedWebViewTextRgb = null;
+      _cachedWebViewBackRgb = null;
+      _cachedRawHtml = null;
+      _cachedRawPlain = null;
+      _cachedRawLog = null;
+      _cachedRawTextRgb = null;
+      _cachedRawBackRgb = null;
+      _linesRefForIncremental = null;
+    }
+  }
+
+  List<LogLine> _linesForMode(int mode) {
+    switch (mode) {
+      case 1:
+        return widget.log.lines;
+      case 2:
+        return _filteredByMode.putIfAbsent(
+          2,
+          () => widget.log.lines.where((x) => x.alarm).toList(growable: false),
+        );
+      case 3:
+        return _filteredByMode.putIfAbsent(
+          3,
+          () => widget.log.lines.where((x) => x.model).toList(growable: false),
+        );
+      case 4:
+        return _filteredByMode.putIfAbsent(
+          4,
+          () => widget.log.lines.where((x) => x.cheat).toList(growable: false),
+        );
+      case 5:
+        return _filteredByMode.putIfAbsent(
+          5,
+          () => widget.log.lines.where((x) => x.tutorial).toList(growable: false),
+        );
+      default:
+        return widget.log.lines;
+    }
+  }
+
+  bool _showAlarmIconsForMode(int mode) {
+    return mode != 2;
+  }
+
+  /// Modes 2–5 used to prefer selection on native; Web uses plain [Text] for perf.
+  bool _selectableDefaultForMode(int mode) {
+    if (mode == 1) {
+      return false;
+    }
+    return !kIsWeb;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (widget.mode == 1) {
-      final lines = widget.log.lines;
-
-      if (widget.webView) {
-        return _buildWebView(lines);
-      }
-
-      return _buildLogListView(
-          lines: lines,
-          lineParams: _lineParams,
-          selectableText: false,
-          showAlarmIcons: true);
-    } else if (widget.mode == 2) {
-      final lines =
-          widget.log.lines.where((x) => x.alarm).toList(growable: false);
-
-      if (widget.webView) {
-        return _buildWebView(lines);
-      }
-
-      return _buildLogListView(
-          lines: lines,
-          lineParams: _lineParams,
-          selectableText: true,
-          showAlarmIcons: false);
-    } else if (widget.mode == 3) {
-      final lines =
-          widget.log.lines.where((x) => x.model).toList(growable: false);
-
-      if (widget.webView) {
-        return _buildWebView(lines);
-      }
-
-      return _buildLogListView(
-          lines: lines,
-          lineParams: _lineParams,
-          selectableText: true,
-          showAlarmIcons: true);
-    } else if (widget.mode == 4) {
-      final lines =
-          widget.log.lines.where((x) => x.cheat).toList(growable: false);
-
-      if (widget.webView) {
-        return _buildWebView(lines);
-      }
-
-      return _buildLogListView(
-          lines: lines,
-          lineParams: _lineParams,
-          selectableText: true,
-          showAlarmIcons: true);
-    } else if (widget.mode == 5) {
-      final lines =
-          widget.log.lines.where((x) => x.tutorial).toList(growable: false);
-
-      if (widget.webView) {
-        return _buildWebView(lines);
-      }
-
-      return _buildLogListView(
-          lines:
-              widget.log.lines.where((x) => x.tutorial).toList(growable: false),
-          lineParams: _lineParams,
-          selectableText: true,
-          showAlarmIcons: true);
-    } else {
+    final mode = widget.mode;
+    if (mode < 1 || mode > 5) {
       return _buildWebRawView();
+    }
+
+    final lines = _linesForMode(mode);
+    if (widget.webView) {
+      return _buildWebView(lines);
+    }
+
+    return _buildLogListView(
+      lines: lines,
+      lineParams: _lineParams,
+      selectableText: _selectableDefaultForMode(mode),
+      showAlarmIcons: _showAlarmIconsForMode(mode),
+    );
+  }
+
+  void _resetIncrementalIfNeeded(List<LogLine> lines) {
+    if (!identical(_linesRefForIncremental, lines)) {
+      _linesRefForIncremental = lines;
+      final total = lines.length;
+      _visibleLineLimit =
+          total <= _initialLineChunk ? total : _initialLineChunk;
+      if (_visibleLineLimit < total) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) {
+            return;
+          }
+          _expandLinesBatch();
+        });
+      }
+    }
+  }
+
+  void _expandLinesBatch() {
+    final total = _linesRefForIncremental?.length ?? 0;
+    if (_visibleLineLimit >= total || total == 0) {
+      return;
+    }
+    setState(() {
+      _visibleLineLimit =
+          total < _visibleLineLimit + _moreLineChunk
+              ? total
+              : _visibleLineLimit + _moreLineChunk;
+    });
+    if (_visibleLineLimit < total) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _expandLinesBatch();
+        }
+      });
     }
   }
 
@@ -114,21 +183,25 @@ class _LogContentsViewState extends State<LogContentsView> {
     required bool selectableText,
     required bool showAlarmIcons,
   }) {
+    _resetIncrementalIfNeeded(lines);
     var width = MediaQuery.of(context).size.width;
     final limitedView = width <= 1024;
+    final displayCount =
+        lines.length < _visibleLineLimit ? lines.length : _visibleLineLimit;
+    final webRowStyle = kIsWeb;
 
     return ListView.builder(
-      shrinkWrap: true,
+      shrinkWrap: false,
       scrollDirection: Axis.vertical,
-      itemCount: lines.length + 1,
+      itemCount: displayCount + 1,
       itemBuilder: (BuildContext context, int index) {
-        if (index == lines.length) {
+        if (index == displayCount) {
           return SizedBox(height: 80);
         }
 
         var line = lines[index];
         var canBeFolded = line.contents.length > 512 ||
-            line.contents.split('\n').length >= 10;
+            line.newlineCount >= 9;
         var longLine = canBeFolded;
         var alarm = line.alarm;
 
@@ -144,10 +217,12 @@ class _LogContentsViewState extends State<LogContentsView> {
         var contents = line.contents;
 
         if (!unfolded) {
-          var firstLine = line.contents.split('\n')[0];
-          contents = firstLine.length > 256
+          final firstSegment = line.firstNewlineIndex < 0
+              ? line.contents
+              : line.contents.substring(0, line.firstNewlineIndex);
+          contents = firstSegment.length > 256
               ? line.contents.substring(0, 256) + "....."
-              : (firstLine + '\n.....');
+              : (firstSegment + '\n.....');
         }
 
         final theme = Theme.of(context);
@@ -158,15 +233,30 @@ class _LogContentsViewState extends State<LogContentsView> {
         final backColor =
             index.isEven ? cardBackground : alternateStripe;
 
+        final borderRadius =
+            webRowStyle ? 8.0 : 20.0;
+        final alarmBorderWidth = webRowStyle ? 1.0 : 2.0;
+        final normalBorderWidth = webRowStyle ? 1.0 : 1.0;
+        final normalBorderColor =
+            webRowStyle ? theme.dividerColor : const Color(0xFF000000);
+
+        if (index == displayCount - 1 && displayCount < lines.length) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _expandLinesBatch();
+            }
+          });
+        }
+
         return Padding(
           padding: const EdgeInsets.only(top: 5),
           child: Container(
             decoration: BoxDecoration(
                 color: backColor,
-                borderRadius: BorderRadius.circular(20.0),
+                borderRadius: BorderRadius.circular(borderRadius),
                 border: Border.all(
-                    color: alarm ? Color(0xFFC19652) : Color(0xFF000000),
-                    width: alarm ? 2 : 1)),
+                    color: alarm ? const Color(0xFFC19652) : normalBorderColor,
+                    width: alarm ? alarmBorderWidth : normalBorderWidth)),
             child: Padding(
               padding: const EdgeInsets.only(top: 7, bottom: 7, left: 0),
               child:
@@ -256,13 +346,27 @@ class _LogContentsViewState extends State<LogContentsView> {
         'rgb(${(backColor.r * 255).round()}, ${(backColor.g * 255).round()}, ${(backColor.b * 255).round()})';
 
     final rawContents = widget.log.originalLog.data.contents;
-    final escaped = const HtmlEscape().convert(rawContents);
-    final contents =
-        '<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head>'
-        '<body style="margin:0;padding:8px;background-color:$backRgb;box-sizing:border-box;">'
-        '<pre style="color:$textRgb;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;margin:0;width:100%;max-width:100%;box-sizing:border-box;font-family:monospace;font-size:14px;line-height:1.4;">'
-        '$escaped'
-        '</pre></body></html>';
+
+    String contents;
+    if (identical(_cachedRawLog, widget.log) &&
+        _cachedRawTextRgb == textRgb &&
+        _cachedRawBackRgb == backRgb &&
+        _cachedRawHtml != null) {
+      contents = _cachedRawHtml!;
+    } else {
+      final escaped = const HtmlEscape().convert(rawContents);
+      contents =
+          '<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head>'
+          '<body style="margin:0;padding:8px;background-color:$backRgb;box-sizing:border-box;">'
+          '<pre style="color:$textRgb;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;margin:0;width:100%;max-width:100%;box-sizing:border-box;font-family:monospace;font-size:14px;line-height:1.4;">'
+          '$escaped'
+          '</pre></body></html>';
+      _cachedRawLog = widget.log;
+      _cachedRawTextRgb = textRgb;
+      _cachedRawBackRgb = backRgb;
+      _cachedRawHtml = contents;
+      _cachedRawPlain = rawContents;
+    }
 
     return Container(
       width: double.infinity,
@@ -272,7 +376,7 @@ class _LogContentsViewState extends State<LogContentsView> {
       child: LogHtmlPreview(
         html: contents,
         maxContentWidth: double.infinity,
-        plainTextFallback: rawContents,
+        plainTextFallback: _cachedRawPlain ?? rawContents,
       ),
     );
   }
@@ -292,13 +396,35 @@ class _LogContentsViewState extends State<LogContentsView> {
     final backRgb =
         'rgb(${(backColor.r * 255).round()}, ${(backColor.g * 255).round()}, ${(backColor.b * 255).round()})';
 
-    final body = lines.map((l) => const HtmlEscape().convert(l.contents)).join('\n');
-    final contents =
-        '<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head>'
-        '<body style="margin:0;padding:8px;background-color:$backRgb;box-sizing:border-box;">'
-        '<pre style="color:$textRgb;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;margin:0;width:100%;max-width:100%;box-sizing:border-box;font-family:monospace;font-size:14px;line-height:1.4;">'
-        '$body'
-        '</pre></body></html>';
+    final String contents;
+    final String plainTextFallback;
+    if (identical(_cachedWebViewLog, widget.log) &&
+        _cachedWebViewMode == widget.mode &&
+        identical(_cachedWebViewLinesRef, lines) &&
+        _cachedWebViewTextRgb == textRgb &&
+        _cachedWebViewBackRgb == backRgb &&
+        _cachedWebViewHtml != null &&
+        _cachedWebViewPlain != null) {
+      contents = _cachedWebViewHtml!;
+      plainTextFallback = _cachedWebViewPlain!;
+    } else {
+      final body =
+          lines.map((l) => const HtmlEscape().convert(l.contents)).join('\n');
+      contents =
+          '<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head>'
+          '<body style="margin:0;padding:8px;background-color:$backRgb;box-sizing:border-box;">'
+          '<pre style="color:$textRgb;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;margin:0;width:100%;max-width:100%;box-sizing:border-box;font-family:monospace;font-size:14px;line-height:1.4;">'
+          '$body'
+          '</pre></body></html>';
+      plainTextFallback = lines.map((l) => l.contents).join('\n');
+      _cachedWebViewHtml = contents;
+      _cachedWebViewPlain = plainTextFallback;
+      _cachedWebViewLinesRef = lines;
+      _cachedWebViewLog = widget.log;
+      _cachedWebViewMode = widget.mode;
+      _cachedWebViewTextRgb = textRgb;
+      _cachedWebViewBackRgb = backRgb;
+    }
 
     return Container(
       width: double.infinity,
@@ -308,7 +434,7 @@ class _LogContentsViewState extends State<LogContentsView> {
       child: LogHtmlPreview(
         html: contents,
         maxContentWidth: double.infinity,
-        plainTextFallback: lines.map((l) => l.contents).join('\n'),
+        plainTextFallback: plainTextFallback,
       ),
     );
   }

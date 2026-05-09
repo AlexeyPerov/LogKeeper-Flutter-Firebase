@@ -60,9 +60,7 @@ class _LogsListState extends State<LogsList> {
           height: totalHeight - projectsListHeight - 20,
           child: BlocBuilder<LogInfosBloc, LogInfosState>(
             builder: (context, LogInfosState state) {
-              var list = state.logs;
-
-              list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+              final list = state.logs;
 
               return ListView.builder(
                 shrinkWrap: true,

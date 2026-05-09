@@ -275,7 +275,19 @@ class LogLine {
   final bool cheat;
   final bool model;
   final bool tutorial;
+  /// Number of `\\n` in [contents]; used for fold heuristics without splitting.
+  final int newlineCount;
+  /// Index of first `\\n`, or `-1` if none.
+  final int firstNewlineIndex;
 
-  LogLine(this.index, this.contents, this.alarm, this.cheat, this.model,
-      this.tutorial);
+  LogLine(
+    this.index,
+    this.contents,
+    this.alarm,
+    this.cheat,
+    this.model,
+    this.tutorial,
+    this.newlineCount,
+    this.firstNewlineIndex,
+  );
 }
